@@ -8,6 +8,7 @@ node_modules/
 
 # Database & vault storage
 storage/
+tmp/
 tmp/wealth-os/wealth-os-db.key
 
 # OS / IDE

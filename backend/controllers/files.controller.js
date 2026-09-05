@@ -2,8 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const JSZip = require('jszip');
+const jwt = require('jsonwebtoken');
 const vaultService = require('../services/vault.service');
 const { getDb, auditWealth, readWealthDb } = require('../db/database');
+
+const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'afa8da06ad7cb9ae41a5c81ecf6f2c29a1a45759d5e0e93615eeeeb51c6118432993a12966a8539530a66aad00b3fbde';
 
 const allowedMimes = new Set([
   'application/pdf',
@@ -29,6 +32,18 @@ function resolveUserFromRequest(req) {
   if (!token) return null;
 
   const db = getDb();
+
+  // Try JWT verification first
+  try {
+    const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+    if (decoded && decoded.sub) {
+      const user = db.prepare('SELECT id, name, email, user_type FROM users WHERE id = ?').get(decoded.sub);
+      if (user) return user;
+    }
+  } catch {
+    // Fall through
+  }
+
   const session = db.prepare('SELECT user_id, expires_at FROM user_sessions WHERE token = ?').get(token);
   if (!session) return null;
 
@@ -122,6 +137,15 @@ exports.getFile = (req, res) => {
       }
     }
 
+    // 3. Fallback for registered asset photos (e.g. car, property, watch images in UI cards)
+    if (!authorizedUserId) {
+      const db = getDb();
+      const assetPhoto = db.prepare('SELECT user_id FROM assets WHERE photo_id = ?').get(fileId);
+      if (assetPhoto) {
+        authorizedUserId = assetPhoto.user_id;
+      }
+    }
+
     if (!authorizedUserId) {
       return res.status(401).json({ error: 'Authentication required to access this file.' });
     }
@@ -134,7 +158,7 @@ exports.getFile = (req, res) => {
     res.setHeader('Content-Type', fileData.mimeType || 'application/octet-stream');
     res.setHeader('Content-Length', fileData.fileBuffer.length);
     res.setHeader('ETag', `"${fileData.checksum}"`);
-    res.setHeader('Cache-Control', 'private, max-age=3600');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
 
     if (req.query.download === 'true') {
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileData.originalName)}"`);

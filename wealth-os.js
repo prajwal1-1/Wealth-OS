@@ -3874,7 +3874,7 @@ function categoryCard(item, category) {
   return `
     <button class="vehicle-card" type="button" data-detail="assets" data-id="${escapeAttribute(item.id)}">
       <span class="vehicle-photo">
-        <img src="${escapeAttribute(image)}" alt="${escapeAttribute(item.name || category.title)}">
+        <img src="${escapeAttribute(image)}" alt="${escapeAttribute(item.name || category.title)}" onerror="if(this.src!=='${escapeAttribute(category.fallback)}'){this.src='${escapeAttribute(category.fallback)}';}">
       </span>
       <span class="vehicle-info">
         <small>${escapeHtml(item.type || category.title)}</small>
