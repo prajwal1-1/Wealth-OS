@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Environment secrets — NEVER commit
+.env
+.env.local
+.env.production
+
+# Database & vault storage
+storage/
+tmp/wealth-os/wealth-os-db.key
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Build artifacts
+*.zip

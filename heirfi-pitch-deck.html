@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Heir.Fi — Digital Estate & Wealth Succession Platform | Pitch Deck</title>
+  <meta name="description" content="Heir.Fi pitch deck for GIFT City Young Builders' Program Fintech Ideation — Privacy-first wealth succession & digital estate vault platform.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0a0f'/><text x='50' y='68' font-family='serif' font-size='55' font-weight='bold' fill='%23c8a55c' text-anchor='middle'>H</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-card-hover: rgba(255,255,255,0.07);
+      --text-primary: #f0ede8;
+      --text-secondary: rgba(240,237,232,0.55);
+      --accent: #c8a55c;
+      --accent-glow: rgba(200,165,92,0.15);
+      --accent-2: #7eb8a0;
+      --accent-3: #a0889c;
+      --border: rgba(255,255,255,0.06);
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 48px;
+      backdrop-filter: blur(20px);
+      background: rgba(10,10,15,0.7);
+      border-bottom: 1px solid var(--border);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+    .nav-logo span { color: var(--text-secondary); font-weight: 400; font-size: 14px; margin-left: 12px; font-family: var(--font-sans); }
+
+    .nav-dots {
+      display: flex;
+      gap: 8px;
+    }
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+    .nav-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+      transform: scale(1.3);
+    }
+
+    .slide-counter {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      min-width: 60px;
+      text-align: right;
+    }
+
+    /* ── Slides ── */
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 80px;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide-inner {
+      max-width: 1200px;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide-inner.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Slide 1: Title ── */
+    .title-slide .overline {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .title-slide h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(52px, 8vw, 96px);
+      font-weight: 800;
+      line-height: 1.05;
+      margin-bottom: 28px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .title-slide .subtitle {
+      font-size: clamp(18px, 2.2vw, 24px);
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 680px;
+      margin-bottom: 48px;
+    }
+
+    .title-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .title-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .mockup-container {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .mockup-container img {
+      width: 100%;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .mockup-container:hover img {
+      transform: scale(1.02);
+    }
+
+    .ambient-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(150px);
+      opacity: 0.12;
+      pointer-events: none;
+    }
+    .glow-1 { background: var(--accent); top: -200px; right: -100px; }
+    .glow-2 { background: var(--accent-2); bottom: -200px; left: -100px; }
+    .glow-3 { background: var(--accent-3); top: 50%; right: 20%; }
+
+    /* ── Slide 2: Problem ── */
+    .problem-stat {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin: 48px 0;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-4px);
+      border-color: rgba(200,165,92,0.2);
+    }
+
+    .stat-card .number {
+      font-family: var(--font-serif);
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .stat-card .label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(32px, 4.5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .section-desc {
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 700px;
+    }
+
+    /* ── Slide 3: Solution ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 48px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      transition: all 0.35s ease;
+      cursor: default;
+    }
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-6px);
+      border-color: rgba(200,165,92,0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .feature-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Slide 4: How It Works ── */
+    .flow-steps {
+      display: flex;
+      gap: 0;
+      margin-top: 48px;
+      position: relative;
+    }
+
+    .flow-step {
+      flex: 1;
+      text-align: center;
+      padding: 32px 24px;
+      position: relative;
+    }
+    .flow-step::after {
+      content: '→';
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      color: var(--accent);
+      opacity: 0.4;
+    }
+    .flow-step:last-child::after { display: none; }
+
+    .flow-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), rgba(200,165,92,0.4));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 auto 16px;
+    }
+
+    .flow-step h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .flow-step p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ── Slide 5: Market ── */
+    .market-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .market-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+    }
+
+    .market-card .big-number {
+      font-family: var(--font-serif);
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .market-card .big-number.gold { color: var(--accent); }
+    .market-card .big-number.green { color: var(--accent-2); }
+
+    .market-card .context {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .market-card .detail {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── Slide 6: Tech Stack ── */
+    .tech-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .tech-pill {
+      padding: 12px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .tech-pill:hover {
+      background: var(--accent-glow);
+      border-color: rgba(200,165,92,0.3);
+      color: var(--accent);
+    }
+
+    .tech-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 48px;
+    }
+
+    .tech-block h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 20px;
+    }
+
+    .tech-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .tech-item .icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .tech-item .info h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .tech-item .info p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* ── Slide 7: Business Model ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .pricing-card.featured {
+      border-color: rgba(200,165,92,0.3);
+      background: linear-gradient(180deg, rgba(200,165,92,0.08) 0%, var(--bg-card) 100%);
+    }
+    .pricing-card.featured::before {
+      content: 'POPULAR';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 16px;
+      background: var(--accent);
+      color: var(--bg-primary);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      border-radius: 100px;
+    }
+
+    .pricing-card .tier {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+    }
+
+    .pricing-card .price {
+      font-family: var(--font-serif);
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .pricing-card .price span {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+    }
+
+    .pricing-card .features {
+      list-style: none;
+      margin-top: 24px;
+      text-align: left;
+    }
+
+    .pricing-card .features li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pricing-card .features li::before {
+      content: '✓';
+      color: var(--accent-2);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    /* ── Slide 8: Team ── */
+    .team-card {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      margin-top: 48px;
+    }
+
+    .team-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif);
+      font-size: 42px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .team-info h3 {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .team-info .role {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .team-info p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ── Slide 9: CTA ── */
+    .cta-slide h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 800;
+      line-height: 1.1;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .cta-slide h1 .highlight {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cta-slide .tagline {
+      font-size: 18px;
+      color: var(--text-secondary);
+      text-align: center;
+      font-weight: 300;
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+
+    .cta-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .cta-btn {
+      padding: 16px 36px;
+      border-radius: 100px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      font-family: var(--font-sans);
+    }
+
+    .cta-btn.primary {
+      background: linear-gradient(135deg, var(--accent), #d4b56a);
+      color: var(--bg-primary);
+    }
+    .cta-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(200,165,92,0.3);
+    }
+
+    .cta-btn.secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .cta-btn.secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(200,165,92,0.2);
+    }
+
+    /* ── Keyboard hint ── */
+    .key-hint {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: var(--text-secondary);
+      opacity: 0.5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 99;
+    }
+    .key-hint kbd {
+      padding: 2px 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-sans);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .slide { padding: 100px 32px; }
+      nav { padding: 16px 24px; }
+      .problem-stat, .feature-grid, .pricing-grid { grid-template-columns: 1fr; }
+      .market-grid, .tech-split { grid-template-columns: 1fr; }
+      .flow-steps { flex-direction: column; }
+      .flow-step::after { display: none; }
+      .team-card { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-logo">Heir.Fi <span>Pitch Deck</span></div>
+    <div class="nav-dots" id="nav-dots"></div>
+    <div class="slide-counter" id="slide-counter">01 / 11</div>
+  </nav>
+
+  <!-- Slide 1: Title -->
+  <section class="slide title-slide" data-slide="0">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="slide-inner">
+      <div class="overline">Young Builders' Program · GIFT City 2026</div>
+      <h1>Heir.Fi</h1>
+      <p class="subtitle">The Digital Family Office for India's affluent families. One premium platform to manage wealth, taxes, legacy, and everything in between.</p>
+      <div class="title-badge">
+        <span class="dot"></span>
+        Fintech Ideation Hackathon · August–October 2026
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2: Problem -->
+  <section class="slide" data-slide="1">
+    <div class="ambient-glow glow-3"></div>
+    <div class="slide-inner">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">India's wealthy families don't know their own net worth.</h2>
+      <p class="section-desc">Their wealth is fragmented across dozens of asset classes, managed through WhatsApp, spreadsheets, and memory. No single system sees everything.</p>
+      <div class="problem-stat">
+        <div class="stat-card">
+          <div class="number">₹5Cr+</div>
+          <div class="label">Families who can only approximate their total net worth when asked directly</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">12+</div>
+          <div class="label">Disconnected tools used to manage assets, taxes, insurance, and documents</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">₹2-5L</div>
+          <div class="label">Tax savings missed annually due to fragmented financial data and poor CA coordination</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: Solution -->
+  <section class="slide" data-slide="2">
+    <div class="slide-inner">
+      <div class="section-label">The Solution</div>
+      <h2 class="section-title">One platform. Your entire financial universe.</h2>
+      <p class="section-desc">Heir.Fi replaces an entire Family Office team with an intelligent, tablet-first platform.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(200,165,92,0.12); color: #c8a55c;">📊</div>
+          <h3>True Net Worth Engine</h3>
+          <p>Real-time market valuations of all assets and liabilities. Per-member profiles rolling into unified family wealth view.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(126,184,160,0.12); color: #7eb8a0;">🧾</div>
+          <h3>CA-Ready Tax Engine</h3>
+          <p>AI extracts Form 16, AIS, salary slips. Automated old vs. new regime comparison with optimization suggestions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(160,136,156,0.12); color: #a0889c;">🏠</div>
+          <h3>Rental Automation</h3>
+          <p>Automated tenant tracking, payment reminders, rent receipt generation, and yield analytics on each property.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(108,165,206,0.12); color: #6ca5ce;">💰</div>
+          <h3>Daily Expense Intelligence</h3>
+          <p>Track daily spending patterns. Categorized analytics showing exactly where money flows each month.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(206,148,108,0.12); color: #ce946c;">🛡️</div>
+          <h3>Smart Insurance Vault</h3>
+          <p>Track all policies, monitor expiry dates, receive smart alerts, and get AI-recommended policy upgrades.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: rgba(200,165,92,0.12); color: #c8a55c;">🔒</div>
+          <h3>Encrypted WILL Vault</h3>
+          <p>Legally secured, zero-knowledge encrypted WILL storage. Disclosed only upon verified legal necessity. Written once, protected forever.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4: Dashboard Preview -->
+  <section class="slide" data-slide="3">
+    <div class="ambient-glow glow-1"></div>
+    <div class="slide-inner" style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+      <div class="section-label">Live Prototype</div>
+      <h2 class="section-title">The Digital Family Office Dashboard</h2>
+      <p class="section-desc" style="margin-bottom:20px;">A beautifully crafted, real-time interface designed specifically for high-net-worth individuals.</p>
+      <div class="mockup-container">
+        <img src="pitch-assets/dashboard.png" alt="Heir.Fi Dashboard Preview">
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Tax Engine Preview -->
+  <section class="slide" data-slide="4">
+    <div class="ambient-glow glow-2"></div>
+    <div class="slide-inner" style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+      <div class="section-label">Automated Tax Engine</div>
+      <h2 class="section-title">Tax preparation, entirely redefined.</h2>
+      <p class="section-desc" style="margin-bottom:20px;">AI-powered document extraction and real-time optimization suggestions for maximum tax savings.</p>
+      <div class="mockup-container">
+        <img src="pitch-assets/tax-engine.png" alt="Heir.Fi Tax Engine Preview">
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 6: How It Works -->
+  <section class="slide" data-slide="5">
+    <div class="slide-inner">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">From chaos to clarity in 4 steps.</h2>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-number">1</div>
+          <h3>Onboard Family</h3>
+          <p>Create profiles for each family member. Define relationships and asset ownership.</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-number">2</div>
+          <h3>Upload & Connect</h3>
+          <p>Upload documents, connect investment accounts, and add all assets & liabilities.</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-number">3</div>
+          <h3>AI Does the Work</h3>
+          <p>OCR extracts tax data, market APIs fetch live valuations, automation handles rent & insurance.</p>
+        </div>
+        <div class="flow-step">
+          <div class="flow-number">4</div>
+          <h3>Manage & Protect</h3>
+          <p>Review your true net worth, file taxes with your CA, and secure your legacy with encrypted WILLs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7: Market Opportunity -->
+  <section class="slide" data-slide="6">
+    <div class="ambient-glow glow-1"></div>
+    <div class="slide-inner">
+      <div class="section-label">Market Opportunity</div>
+      <h2 class="section-title">A massive, underserved market.</h2>
+      <p class="section-desc">India's wealth is exploding, but the tools to manage it haven't kept up.</p>
+      <div class="market-grid">
+        <div class="market-card">
+          <div class="big-number gold">9.5L+</div>
+          <div class="context">HNWI Households in India</div>
+          <div class="detail">Families with ₹5Cr+ investable assets, growing at 12.5% CAGR. Each represents a ₹25K–₹1L/year subscription opportunity.</div>
+        </div>
+        <div class="market-card">
+          <div class="big-number green">$63B</div>
+          <div class="context">India WealthTech TAM by 2030</div>
+          <div class="detail">The Indian wealth management market is projected to reach $63 billion, driven by digitization and the growing affluent class.</div>
+        </div>
+        <div class="market-card">
+          <div class="big-number gold">Zero</div>
+          <div class="context">Comprehensive Competitors</div>
+          <div class="detail">No existing platform in India combines wealth tracking, tax engine, rental automation, insurance, expense tracking, and WILL execution.</div>
+        </div>
+        <div class="market-card">
+          <div class="big-number green">85%</div>
+          <div class="context">Indians Without a WILL</div>
+          <div class="detail">An estimated 85% of Indians die intestate. Our encrypted WILL vault addresses a critical, untapped legal need for HNWIs.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 8: Tech Stack -->
+  <section class="slide" data-slide="7">
+    <div class="slide-inner">
+      <div class="section-label">Technology</div>
+      <h2 class="section-title">Built with modern, scalable infrastructure.</h2>
+      <div class="tech-split">
+        <div class="tech-block">
+          <h3>Frontend & Experience</h3>
+          <div class="tech-item">
+            <div class="icon">🖥️</div>
+            <div class="info">
+              <h4>Tablet-First Responsive UI</h4>
+              <p>Premium glassmorphic dashboard optimized for iPad & tablet browsing</p>
+            </div>
+          </div>
+          <div class="tech-item">
+            <div class="icon">📊</div>
+            <div class="info">
+              <h4>Chart.js Visualizations</h4>
+              <p>Real-time donut charts, bar graphs, and trend lines for net worth & tax</p>
+            </div>
+          </div>
+          <div class="tech-item">
+            <div class="icon">🎨</div>
+            <div class="info">
+              <h4>Modern Design System</h4>
+              <p>Custom CSS architecture with dark mode, animations, and micro-interactions</p>
+            </div>
+          </div>
+        </div>
+        <div class="tech-block">
+          <h3>Backend & Intelligence</h3>
+          <div class="tech-item">
+            <div class="icon">⚡</div>
+            <div class="info">
+              <h4>Node.js + Express</h4>
+              <p>High-performance REST API with session-based authentication</p>
+            </div>
+          </div>
+          <div class="tech-item">
+            <div class="icon">🤖</div>
+            <div class="info">
+              <h4>AI-Powered OCR</h4>
+              <p>Tesseract.js for automated document data extraction from Form 16 & salary slips</p>
+            </div>
+          </div>
+          <div class="tech-item">
+            <div class="icon">🔐</div>
+            <div class="info">
+              <h4>End-to-End Encryption</h4>
+              <p>Zero-knowledge WILL vault with AES-256 encryption at rest</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 9: Business Model -->
+  <section class="slide" data-slide="8">
+    <div class="slide-inner">
+      <div class="section-label">Business Model</div>
+      <h2 class="section-title">Premium SaaS for premium families.</h2>
+      <p class="section-desc">Subscription-based pricing with high-value tiers targeting affluent households.</p>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="tier">Essential</div>
+          <div class="price">₹2,499<span>/mo</span></div>
+          <ul class="features">
+            <li>True Net Worth Dashboard</li>
+            <li>Up to 3 Family Members</li>
+            <li>Document Vault (50 docs)</li>
+            <li>Basic Tax Readiness</li>
+            <li>Expense Tracking</li>
+          </ul>
+        </div>
+        <div class="pricing-card featured">
+          <div class="tier">Family Office</div>
+          <div class="price">₹7,499<span>/mo</span></div>
+          <ul class="features">
+            <li>Everything in Essential</li>
+            <li>Unlimited Family Members</li>
+            <li>Full Tax Engine + CA Export</li>
+            <li>Rental Automation</li>
+            <li>Smart Insurance Tracking</li>
+            <li>Encrypted WILL Vault</li>
+          </ul>
+        </div>
+        <div class="pricing-card">
+          <div class="tier">Legacy</div>
+          <div class="price">₹19,999<span>/mo</span></div>
+          <ul class="features">
+            <li>Everything in Family Office</li>
+            <li>Dedicated Wealth Advisor</li>
+            <li>Legal WILL Drafting Team</li>
+            <li>Home Security Integration</li>
+            <li>White-Glove Onboarding</li>
+            <li>Priority Support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 10: Team -->
+  <section class="slide" data-slide="9">
+    <div class="slide-inner">
+      <div class="section-label">The Builder</div>
+      <h2 class="section-title">Solo founder. Full-stack execution.</h2>
+      <div class="team-card">
+        <div class="team-avatar">P</div>
+        <div class="team-info">
+          <h3>Prajwal</h3>
+          <div class="role">Founder & Full-Stack Developer</div>
+          <p>A passionate young builder who has single-handedly designed and engineered the entire Heir.Fi prototype — from the real-time tax engine and AI document extraction to the glassmorphic dashboard UI. Driven by the belief that managing generational wealth shouldn't require a team of 10 professionals when one intelligent platform can do it all.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 11: CTA -->
+  <section class="slide cta-slide" data-slide="10">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="slide-inner" style="text-align: center;">
+      <div class="section-label" style="text-align: center;">The Ask</div>
+      <h1>Let's build the future of <span class="highlight">family wealth</span> in India.</h1>
+      <p class="tagline">Heir.Fi is ready to scale. We need GIFT City's ecosystem, mentorship, and network to make it happen.</p>
+      <div class="cta-actions">
+        <button class="cta-btn primary" onclick="window.scrollTo({top:0, behavior:'smooth'})">Start from Top ↑</button>
+        <button class="cta-btn secondary">prajwal@heirfi.in</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="key-hint">
+    <kbd>↑</kbd> <kbd>↓</kbd> or scroll to navigate
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const dotsContainer = document.getElementById('nav-dots');
+    const counter = document.getElementById('slide-counter');
+
+    // Create nav dots
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.classList.add('nav-dot');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => {
+        slides[i].scrollIntoView({ behavior: 'smooth' });
+      });
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.nav-dot');
+
+    // Intersection Observer for slide animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const inner = entry.target.querySelector('.slide-inner');
+        if (entry.isIntersecting) {
+          inner.classList.add('visible');
+          const index = parseInt(entry.target.dataset.slide);
+          dots.forEach((d, i) => d.classList.toggle('active', i === index));
+          counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+        }
+      });
+    }, { threshold: 0.4 });
+
+    slides.forEach(slide => observer.observe(slide));
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      const current = [...slides].findIndex(s => {
+        const rect = s.getBoundingClientRect();
+        return rect.top >= -100 && rect.top <= window.innerHeight / 2;
+      });
+
+      if (e.key === 'ArrowDown' || e.key === ' ') {
+        e.preventDefault();
+        const next = Math.min(current + 1, slides.length - 1);
+        slides[next].scrollIntoView({ behavior: 'smooth' });
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prev = Math.max(current - 1, 0);
+        slides[prev].scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  </script>
+
+</body>
+</html>

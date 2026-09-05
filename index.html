@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Wealth OS is an enterprise-grade personal wealth operating system with AES-256-GCM encrypted vaults, multi-regime tax optimization, and digital estate succession tracking.">
+  <title>Wealth OS | Zero-Knowledge Personal Wealth Command Center</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2309090b'/><text x='50' y='68' font-family='sans-serif' font-size='55' font-weight='bold' fill='%2310b981' text-anchor='middle'>W</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Inter:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="wealth-os.css?v=5.5">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <section class="auth-screen" id="auth-screen">
+    <div class="auth-brand">
+      <strong>WEALTH OS</strong>
+      <small>Personal wealth operating system</small>
+    </div>
+    <form class="auth-card" id="auth-form">
+      <div class="auth-tabs" role="tablist" aria-label="Authentication mode">
+        <button class="auth-tab active" type="button" data-auth-mode="login">Login</button>
+        <button class="auth-tab" type="button" data-auth-mode="register">Create account</button>
+      </div>
+      <div class="auth-copy">
+        <span id="auth-kicker">Welcome back</span>
+        <h1 id="auth-title">Open your family dashboard.</h1>
+      </div>
+      <label class="register-only">
+        Full name
+        <input name="name" autocomplete="name" placeholder="Prajwal Bharad">
+      </label>
+      <label>
+        Email
+        <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters">
+      </label>
+      <p class="auth-error" id="auth-error" role="alert"></p>
+      <button class="auth-submit" type="submit" id="auth-submit">Login</button>
+      <p class="auth-note">Your records are stored on this app server under your account.</p>
+    </form>
+  </section>
+
+  <main class="app-shell locked" id="app-shell">
+    <aside class="app-sidebar">
+      <a class="back-link" href="index.html" aria-label="Back to portfolio">
+        <span aria-hidden="true">&lt;</span> Portfolio
+      </a>
+      <div class="brand-lockup">
+        <div>
+          <strong>WEALTH OS</strong>
+          <small>ALPHA</small>
+        </div>
+      </div>
+      <nav class="side-nav" aria-label="App navigation">
+        <button class="tab active" type="button" data-view="home" aria-current="page"><span class="nav-icon home-icon"></span><b>Dashboard</b></button>
+        <button class="tab" type="button" data-view="assets"><span class="nav-icon chart-icon"></span><b>Assets</b></button>
+        <button class="tab" type="button" data-view="incomeStreams"><span class="nav-icon chart-icon"></span><b>Income</b></button>
+        <button class="tab" type="button" data-view="documents"><span class="nav-icon doc-icon"></span><b>Documents</b></button>
+        <button class="tab" type="button" data-view="taxDocuments"><span class="nav-icon doc-icon"></span><b>Tax Documents</b></button>
+        <button class="tab" type="button" data-view="willVault"><span class="nav-icon shield-icon"></span><b>Will Vault</b></button>
+        <button class="tab" type="button" data-view="cameras"><span class="nav-icon cam-icon"></span><b>Cameras</b></button>
+        <button class="tab" type="button" data-view="cashflow"><span class="nav-icon chart-icon"></span><b>Cash Flow</b></button>
+        <button class="tab" type="button" data-view="reports"><span class="nav-icon chart-icon"></span><b>Reports</b></button>
+        <button class="tab" type="button" data-view="ai"><span class="nav-icon ai-icon"></span><b>Advisor</b></button>
+      </nav>
+      <div class="user-card">
+        <span id="user-initials">U</span>
+        <div>
+          <strong id="user-name">User</strong>
+          <small id="user-email">Signed in</small>
+        </div>
+      </div>
+      <button class="logout-button" id="logout-button" type="button">Logout</button>
+    </aside>
+
+    <section class="workspace">
+      <header class="workspace-top">
+        <div>
+          <span class="eyebrow" id="view-label">Home</span>
+          <h1 id="screen-title">Dashboard</h1>
+        </div>
+        <div class="top-actions">
+          <label class="search-box" aria-label="Search records">
+            <input id="global-search" type="search" placeholder="Search assets, docs, loans...">
+          </label>
+          <span class="save-state" id="save-state">Saved</span>
+          <button class="secondary-action top-utility" id="export-data" type="button">Export</button>
+          <button class="secondary-action top-utility" id="import-data" type="button">Import</button>
+          <button class="secondary-action top-utility danger-utility" id="reset-data" type="button">Start Fresh</button>
+          <button class="call-button" id="ask-ai-shortcut" type="button">Ask AI</button>
+        </div>
+      </header>
+      <input class="hidden-file" id="import-file" type="file" accept="application/json,text/csv,.json,.csv">
+
+      <section class="summary-strip" aria-label="Financial summary">
+        <div>
+          <span>Net Worth</span>
+          <strong id="hero-net-worth">INR 0</strong>
+        </div>
+        <div>
+          <span>Total Assets</span>
+          <strong id="summary-assets">INR 0</strong>
+        </div>
+        <div>
+          <span>Documents</span>
+          <strong id="summary-documents">0</strong>
+        </div>
+        <div>
+          <span>Cash Balance</span>
+          <strong id="summary-cash">INR 0</strong>
+        </div>
+      </section>
+
+      <div class="content-grid">
+        <section class="main-panel">
+          <div class="app-actions" id="app-actions"></div>
+          <div class="module-grid" id="module-grid"></div>
+          <div class="app-list" id="app-list"></div>
+        </section>
+        <aside class="insight-panel" aria-label="Advisor and timeline">
+          <div class="advisor-card">
+            <span>Simple guide</span>
+            <strong id="advisor-question">What should I add first?</strong>
+            <p id="advisor-answer">Start with one big purchase, then attach its documents.</p>
+          </div>
+          <div class="timeline-card">
+            <span>Wealth timeline</span>
+            <ul id="timeline-list"></ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <nav class="mobile-nav" aria-label="Mobile app navigation">
+    <button class="mobile-tab active" type="button" data-view="home"><span class="nav-icon home-icon"></span><b>Home</b></button>
+    <button class="mobile-tab" type="button" data-view="assets"><span class="nav-icon chart-icon"></span><b>Assets</b></button>
+    <button class="mobile-tab" type="button" data-view="incomeStreams"><span class="nav-icon chart-icon"></span><b>Income</b></button>
+    <button class="mobile-tab" type="button" data-view="documents"><span class="nav-icon doc-icon"></span><b>Docs</b></button>
+    <button class="mobile-tab" type="button" data-view="taxDocuments"><span class="nav-icon doc-icon"></span><b>Tax</b></button>
+    <button class="mobile-tab" type="button" data-view="cashflow"><span class="nav-icon chart-icon"></span><b>Flow</b></button>
+    <button class="mobile-tab" type="button" data-view="reports"><span class="nav-icon chart-icon"></span><b>Reports</b></button>
+    <button class="mobile-tab" type="button" data-view="ai"><span class="nav-icon ai-icon"></span><b>AI</b></button>
+  </nav>
+
+  <dialog class="entry-modal" id="entry-modal">
+    <form method="dialog" class="entry-card" id="entry-form">
+      <div class="entry-head">
+        <div>
+          <span id="entry-kicker">Add item</span>
+          <strong id="entry-title">New record</strong>
+        </div>
+        <button class="icon-button" value="cancel" type="button" id="close-modal" aria-label="Close">x</button>
+      </div>
+      <div class="entry-fields" id="entry-fields"></div>
+      <div class="entry-actions">
+        <button class="danger-button" type="button" id="delete-record">Delete</button>
+        <button class="ghost-button" value="cancel" type="button" id="cancel-modal">Cancel</button>
+        <button class="save-button" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="entry-modal preview-modal" id="preview-modal">
+    <div class="entry-card preview-card">
+      <div class="entry-head">
+        <div>
+          <span>Saved file</span>
+          <strong id="preview-title">Document preview</strong>
+        </div>
+        <button class="icon-button" type="button" id="close-preview" aria-label="Close">x</button>
+      </div>
+      <div class="preview-body" id="preview-body"></div>
+    </div>
+  </dialog>
+
+  <script src="js/config.js?v=5.5"></script>
+  <script src="js/state_api_utils.js?v=5.5"></script>
+  <script src="js/data-sync.js?v=5.5"></script>
+  <script src="js/ui-ai-parsing.js?v=5.5"></script>
+  <script src="js/ui-assets_dash.js?v=5.5"></script>
+  <script src="js/ui-cashflow.js?v=5.5"></script>
+  <script src="js/ui-charts.js?v=5.5"></script>
+  <script src="js/ui-tax-charts.js?v=5.5"></script>
+  <script src="js/ui-tax-integration.js?v=5.5"></script>
+  <script src="js/ui-tax-profile.js?v=5.5"></script>
+  <script src="js/ui-tax.js?v=5.5"></script>
+  <script src="js/ui-will-vault.js?v=5.5"></script>
+  <script src="js/ui-cameras.js?v=5.5"></script>
+  <script src="js/ui-income.js?v=5.5"></script>
+  <script src="js/ui-documents.js?v=5.5"></script>
+  <script src="js/ui-reports.js?v=5.5"></script>
+  <script src="js/ui-ai-advisor.js?v=5.5"></script>
+  <script src="js/app.js?v=5.5"></script>
+</body>
+</html>

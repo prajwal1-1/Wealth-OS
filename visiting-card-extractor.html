@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Extract visiting card contacts and business card details from PDF documents into Excel with automated OCR parsing.">
+  <title>Card OCR Extractor | Smart PDF & Visiting Card Contact Parser</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2307110f'/><text x='50' y='68' font-family='sans-serif' font-size='55' font-weight='bold' fill='%238ee8cf' text-anchor='middle'>OCR</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="card-extractor.css">
+</head>
+<body>
+  <header class="tool-header">
+    <a class="brand" href="index.html"><span>PB</span><strong>Card OCR</strong></a>
+    <nav aria-label="Tool navigation">
+      <a href="index.html">Portfolio</a>
+      <a href="#results">Results</a>
+    </nav>
+  </header>
+
+  <main class="tool-shell">
+    <section class="tool-hero">
+      <div>
+        <span class="eyebrow">PDF to Excel automation</span>
+        <h1>Extract visiting card details from one PDF.</h1>
+        <p>Upload a PDF containing front and back visiting card images. The tool reads the cards, extracts names, phone numbers, emails, company details, websites, addresses, and exports everything into an Excel file.</p>
+      </div>
+      <div class="privacy-panel">
+        <strong>Review-first accuracy</strong>
+        <p>The tool improves scan clarity, reads each card, marks doubtful rows, and keeps the final table editable before Excel export.</p>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <article class="upload-panel">
+        <label class="drop-zone" for="pdfInput" id="dropZone">
+          <input id="pdfInput" type="file" accept="application/pdf">
+          <span>PDF</span>
+          <strong>Drop visiting-card PDF here</strong>
+          <small>or click to choose a file</small>
+        </label>
+
+        <div class="controls">
+          <label class="toggle-row">
+            <input id="pairSides" type="checkbox" checked>
+            <span>Pair every two detected card sides as front and back</span>
+          </label>
+          <label class="toggle-row">
+            <input id="pageAsCard" type="checkbox" checked>
+            <span>Treat each PDF page as one full visiting-card side</span>
+          </label>
+          <label class="toggle-row">
+            <input id="enhanceImages" type="checkbox" checked>
+            <span>Clean and sharpen PDF pages before OCR</span>
+          </label>
+          <label>
+            OCR language
+            <select id="ocrLanguage">
+              <option value="eng" selected>English</option>
+              <option value="eng+hin">English + Hindi</option>
+              <option value="eng+mar">English + Marathi</option>
+            </select>
+          </label>
+          <label>
+            Accuracy mode
+            <select id="accuracyMode">
+              <option value="best" selected>Best result</option>
+              <option value="fast">Fast scan</option>
+            </select>
+          </label>
+          <button class="primary-action" id="startButton" type="button" disabled>Extract cards</button>
+        </div>
+
+        <div class="progress-box" aria-live="polite">
+          <div class="progress-line"><i id="progressBar"></i></div>
+          <strong id="statusText">Choose a PDF to begin.</strong>
+          <span id="detailText">OCR quality depends on scan clarity. Higher-resolution PDFs give better results.</span>
+          <span class="backend-mode" id="backendMode">Backend mode is available when opened from localhost.</span>
+          <span class="backend-mode ai-mode" id="aiMode">AI cleanup status is checked when backend opens.</span>
+        </div>
+      </article>
+
+      <article class="summary-panel">
+        <div><span>Detected rows</span><strong id="rowCount">0</strong></div>
+        <div><span>Pages read</span><strong id="pageCount">0</strong></div>
+        <div><span>Need review</span><strong id="reviewCount">0</strong></div>
+      </article>
+    </section>
+
+    <section class="results-section" id="results">
+      <div class="results-head">
+        <div>
+          <span class="eyebrow">Review before download</span>
+          <h2>Extracted data</h2>
+        </div>
+        <div class="result-actions">
+          <button id="clearButton" type="button">Clear</button>
+          <button id="downloadButton" type="button" disabled>Download Excel</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Card preview</th>
+              <th>Name</th>
+              <th>Company</th>
+              <th>Designation</th>
+              <th>Phones</th>
+              <th>Email</th>
+              <th>Website</th>
+              <th>Address</th>
+              <th>Quality</th>
+              <th>Warnings</th>
+              <th>Raw text</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            <tr class="empty-row"><td colspan="11">Extracted visiting cards will appear here.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="card-extractor.js"></script>
+</body>
+</html>
