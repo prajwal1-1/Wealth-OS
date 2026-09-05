@@ -3,16 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wealth OS | Institutional-Grade Family Office</title>
+  <title>Wealth OS | Personal Wealth Command Center</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,800;0,900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="wealth-os.css">
   <style>
-    /* Premium Landing Page Specifics */
+    /* Neo-Brutalist Landing Page */
     body {
-      background: #0a0a0b;
-      color: #fafafa;
+      background: #fbfaf4;
+      background-image: 
+        linear-gradient(126deg, transparent 0 74%, #9aed68 74% 77%, transparent 77%),
+        radial-gradient(rgba(154, 237, 104, 0.25) 1px, transparent 1px);
+      background-size: 100% 100%, 24px 24px;
+      color: #090909;
       margin: 0;
       font-family: 'Plus Jakarta Sans', sans-serif;
       overflow-x: hidden;
@@ -21,128 +25,208 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 48px;
-      position: fixed;
-      top: 0; left: 0; right: 0;
+      padding: 16px 32px;
+      border-bottom: 3px solid #111;
+      background: #fbfaf4;
+      position: sticky;
+      top: 0;
       z-index: 100;
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 4px 0 #111;
     }
     .landing-nav .logo {
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      font-size: 18px;
+      font-weight: 900;
+      font-size: 24px;
       display: flex;
       align-items: center;
       gap: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
     .landing-nav .logo span {
-      width: 24px; height: 24px;
-      background: #10b981;
-      border-radius: 6px;
-      display: inline-block;
+      width: 32px; height: 32px;
+      background: #9aed68;
+      border: 3px solid #111;
+      border-radius: 50%;
+      box-shadow: 3px 3px 0 #111;
     }
     .landing-nav a.btn {
-      background: #fafafa;
-      color: #0a0a0b;
+      background: #fbfaf4;
+      color: #090909;
       padding: 10px 24px;
-      border-radius: 99px;
+      border: 3px solid #111;
+      border-radius: 12px;
       text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-      transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+      font-weight: 800;
+      box-shadow: 4px 4px 0 #111;
+      transition: all 0.1s ease;
     }
     .landing-nav a.btn:hover {
-      transform: scale(0.96);
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 #111;
+      background: #9aed68;
     }
-    
+    .landing-nav a.btn:active {
+      transform: translate(4px, 4px);
+      box-shadow: 0 0 0 #111;
+    }
+
     .hero {
-      min-height: 100vh;
+      min-height: calc(100vh - 80px);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 0 24px;
-      background: radial-gradient(circle at 50% 0%, rgba(16,185,129,0.15) 0%, transparent 60%);
+      padding: 60px 24px;
+    }
+    .hero-badge {
+      background: #fbfaf4;
+      border: 3px solid #111;
+      padding: 8px 16px;
+      border-radius: 99px;
+      font-weight: 800;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      box-shadow: 4px 4px 0 #111;
+      margin-bottom: 24px;
+      display: inline-block;
     }
     .hero h1 {
-      font-size: clamp(48px, 8vw, 96px);
-      font-weight: 300;
-      letter-spacing: -0.04em;
-      line-height: 1.1;
+      font-size: clamp(48px, 8vw, 100px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1;
       max-width: 1000px;
       margin: 0 0 24px 0;
+      text-transform: uppercase;
+    }
+    .hero h1 span {
+      color: #fbfaf4;
+      -webkit-text-stroke: 3px #111;
+      text-shadow: 6px 6px 0 #9aed68;
     }
     .hero p {
       font-size: clamp(18px, 2vw, 24px);
-      color: #a1a1aa;
-      font-weight: 400;
-      max-width: 600px;
+      color: #5f5f57;
+      font-weight: 600;
+      max-width: 700px;
       margin: 0 0 48px 0;
+      line-height: 1.5;
     }
     .hero .ctas {
       display: flex;
-      gap: 16px;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .btn-primary {
-      background: #10b981;
-      color: #0a0a0b;
-      padding: 16px 32px;
-      border-radius: 99px;
+      background: #9aed68;
+      color: #111;
+      padding: 16px 36px;
+      border: 3px solid #111;
+      border-radius: 16px;
       text-decoration: none;
-      font-size: 18px;
-      font-weight: 500;
-      transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 8px 8px 0 #111;
+      transition: all 0.1s ease;
+      text-transform: uppercase;
     }
     .btn-secondary {
-      background: rgba(255,255,255,0.05);
-      color: #fafafa;
-      padding: 16px 32px;
-      border-radius: 99px;
+      background: #fbfaf4;
+      color: #111;
+      padding: 16px 36px;
+      border: 3px solid #111;
+      border-radius: 16px;
       text-decoration: none;
-      font-size: 18px;
-      font-weight: 500;
-      border: 1px solid rgba(255,255,255,0.1);
-      transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 8px 8px 0 #111;
+      transition: all 0.1s ease;
+      text-transform: uppercase;
     }
-    .btn-primary:hover, .btn-secondary:hover { transform: scale(0.96); }
+    .btn-primary:hover, .btn-secondary:hover { 
+      transform: translate(3px, 3px);
+      box-shadow: 5px 5px 0 #111;
+    }
+    .btn-primary:active, .btn-secondary:active {
+      transform: translate(8px, 8px);
+      box-shadow: 0 0 0 #111;
+    }
 
     .bento {
-      padding: 120px 24px;
-      max-width: 1200px;
+      padding: 80px 24px;
+      max-width: 1300px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 32px;
     }
     .bento-card {
-      background: #121214;
-      border: 1px solid rgba(255,255,255,0.08);
+      background: #fbfaf4;
+      border: 4px solid #111;
       border-radius: 24px;
       padding: 40px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 24px 48px -12px rgba(0,0,0,0.8);
-      transition: transform 300ms cubic-bezier(0.175, 0.885, 0.32, 1.1);
+      box-shadow: 12px 12px 0 #111;
+      transition: all 0.2s ease;
+      position: relative;
     }
     .bento-card:hover {
-      transform: translateY(-8px);
+      transform: translate(-4px, -4px);
+      box-shadow: 16px 16px 0 #111;
     }
     .bento-card.large {
       grid-column: span 2;
+      background: #242424;
+      color: #fbfaf4;
+    }
+    .bento-card.large h3 {
+      color: #9aed68;
+    }
+    .bento-card.large p {
+      color: #d2d2ca;
+    }
+    .bento-card .icon-wrapper {
+      width: 64px; height: 64px;
+      background: #9aed68;
+      border: 3px solid #111;
+      border-radius: 16px;
+      box-shadow: 4px 4px 0 #111;
+      margin-bottom: 12px;
+    }
+    .bento-card.large .icon-wrapper {
+      background: #fbfaf4;
     }
     .bento-card h3 {
-      font-size: 24px;
-      font-weight: 400;
+      font-size: 28px;
+      font-weight: 900;
       margin: 0;
+      text-transform: uppercase;
       letter-spacing: -0.02em;
     }
     .bento-card p {
-      color: #a1a1aa;
-      line-height: 1.6;
+      color: #5f5f57;
+      line-height: 1.5;
+      font-size: 18px;
+      font-weight: 600;
       margin: 0;
+    }
+
+    /* Media Queries for Mobile */
+    @media (max-width: 900px) {
+      .bento {
+        grid-template-columns: 1fr;
+      }
+      .bento-card.large {
+        grid-column: span 1;
+      }
+      .hero h1 {
+        font-size: 56px;
+      }
     }
   </style>
 </head>
@@ -150,34 +234,39 @@
 
   <nav class="landing-nav">
     <div class="logo"><span></span> Wealth OS</div>
-    <a href="wealth-os.html" class="btn">Enter App</a>
+    <a href="wealth-os.html" class="btn">Login</a>
   </nav>
 
   <section class="hero">
-    <h1>The zero-knowledge <br>family office.</h1>
+    <div class="hero-badge">Buildathon 2024</div>
+    <h1>The Zero-Knowledge <br><span>Family Office</span></h1>
     <p>Consolidate your global assets, manage tax regimes, and secure your digital estate with AES-256-GCM envelope encryption.</p>
     <div class="ctas">
-      <a href="wealth-os.html" class="btn-primary">Launch Dashboard</a>
+      <a href="wealth-os.html" class="btn-primary">Launch App</a>
       <a href="https://razorpay.com/buildathon/" class="btn-secondary" target="_blank">Razorpay Buildathon</a>
     </div>
   </section>
 
   <section class="bento">
     <div class="bento-card large">
+      <div class="icon-wrapper"></div>
       <h3>Multi-Asset Consolidation</h3>
       <p>Track real estate, luxury watches, private equity, and global cash balances in a single, unified pane of glass.</p>
     </div>
     <div class="bento-card">
-      <h3>Military-Grade Vault</h3>
-      <p>Your documents are encrypted entirely client-side. We cannot read your wills, tax returns, or deeds.</p>
+      <div class="icon-wrapper"></div>
+      <h3>Military Vault</h3>
+      <p>Your documents are encrypted client-side. We cannot read your wills, tax returns, or deeds.</p>
     </div>
     <div class="bento-card">
-      <h3>AI Tax Optimization</h3>
-      <p>Connect your CA. Let our engine automatically optimize capital gains across international jurisdictions.</p>
+      <div class="icon-wrapper"></div>
+      <h3>AI Tax Engine</h3>
+      <p>Connect your CA. Let our engine optimize capital gains across international jurisdictions instantly.</p>
     </div>
     <div class="bento-card large">
+      <div class="icon-wrapper"></div>
       <h3>Automated Succession</h3>
-      <p>Configure dead-man switches and digital trusts. Your wealth automatically transfers to your beneficiaries.</p>
+      <p>Configure dead-man switches and digital trusts. Your wealth securely transfers to your beneficiaries without probate.</p>
     </div>
   </section>
 
