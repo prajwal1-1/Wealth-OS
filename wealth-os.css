@@ -13561,3 +13561,126 @@ h1, h2, h3, h4, h5, h6 {
 strong, b {
   font-weight: 500 !important;
 }
+
+/* ==============================================================
+   IMPECCABLE SKILL: POLISH & DISTILL PASS
+   Hierarchy, Clutter Removal, and Focus
+   ============================================================== */
+
+/* 1. Simplify Top Actions (Distill) */
+.top-actions {
+  gap: 12px !important;
+}
+.search-box input {
+  border-radius: 99px !important;
+  padding: 10px 20px !important;
+  border: var(--glass-border) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+/* Hide the dangerous reset button from top-level header */
+#reset-data {
+  display: none !important;
+}
+/* Make export/import utilities look more subtle (quieter) */
+.top-utility {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+.top-utility:hover {
+  opacity: 1;
+}
+
+/* 2. Elevate the Summary Strip (Hierarchy) */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px !important;
+  padding: 32px 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 32px;
+}
+.summary-strip > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.summary-strip span {
+  font-size: 13px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted) !important;
+  font-weight: 600 !important;
+}
+.summary-strip strong {
+  font-size: clamp(28px, 4vw, 42px) !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.04em !important;
+  color: var(--ink) !important;
+  line-height: 1;
+}
+
+/* 3. Insight Panel Polish (Advisor & Timeline) */
+.insight-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px !important;
+}
+.advisor-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.05)) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  border-radius: 20px !important;
+  padding: 28px !important;
+}
+.advisor-card span {
+  color: var(--green) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.advisor-card strong {
+  display: block;
+  margin: 12px 0 8px;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  color: var(--ink) !important;
+}
+.advisor-card p {
+  color: var(--dark-ink) !important;
+  font-size: 14px !important;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+/* 4. Timeline Polish */
+.timeline-card {
+  background: transparent !important;
+  border: var(--glass-border) !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+}
+.timeline-card span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+  display: block;
+}
+
+/* 5. Mobile Nav Clutter Fix */
+@media (max-width: 800px) {
+  .mobile-nav {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 12px;
+    scrollbar-width: none;
+  }
+  .mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .mobile-tab {
+    flex-shrink: 0;
+  }
+}
