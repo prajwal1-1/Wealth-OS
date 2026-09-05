@@ -1180,8 +1180,7 @@ body.view-ai .main-panel {
 /* Final bug fix: allow scrolling and keep text readable on the light map theme */
 html,
 body {
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .app-shell,
@@ -2307,7 +2306,7 @@ body {
 
 /* Final reference-match pass: compact, glassy, and closer to the supplied dashboard */
 body {
-  overflow: hidden;
+  overflow: visible;
 }
 
 .app-shell {
@@ -2315,7 +2314,7 @@ body {
 }
 
 .app-sidebar {
-  overflow: hidden;
+  overflow: visible;
   padding: 18px 10px 10px;
 }
 
@@ -3087,8 +3086,7 @@ html,
 body {
   min-height: 100%;
   height: auto;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .app-shell,
@@ -5458,11 +5456,14 @@ body {
 
 /* Sidebar access fix: keep the rail pinned and move navigation near the top */
 .app-sidebar {
-  position: sticky;
-  top: 18px;
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 18px !important;
+  align-self: start !important;
   height: calc(100vh - 36px);
   min-height: 560px;
   grid-template-rows: auto 1fr auto;
+  z-index: 100 !important;
 }
 
 .side-nav {
@@ -5505,14 +5506,15 @@ body {
   }
 }
 
-/* Sidebar label visibility fix */
+/* Sidebar label visibility fix & sticky follow alignment */
 .app-shell {
-  overflow: visible;
+  overflow: visible !important;
+  align-items: start !important;
 }
 
 .app-sidebar {
-  z-index: 50;
-  overflow: visible;
+  z-index: 100 !important;
+  overflow: visible !important;
 }
 
 .app-sidebar::before,
@@ -9607,12 +9609,11 @@ body {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none;
-}
-
-.tax-nav-tabs::-webkit-scrollbar {
-  display: none;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.35) transparent;
+  scroll-behavior: smooth;
+  cursor: grab;
 }
 
 .tax-tab-btn {
@@ -12926,4 +12927,382 @@ body.view-cashflow .app-list {
   color: #64748b !important;
   font-weight: 600 !important;
 }
+
+/* ==========================================================================
+   UNIVERSAL MOVABLE HORIZONTAL SCROLL & FLOATING NAVIGATION CONTROLS
+   ========================================================================== */
+.horizontal-scrollable,
+.tax-nav-tabs,
+.income-ai-tabs-nav,
+.floating-tabs-container,
+.tax-persona-tabs,
+.filter-bar,
+.investment-filter-controls,
+.table-wrap,
+[data-horizontal-scroll="true"],
+div[style*="overflow-x: auto"],
+div[style*="overflow-x:auto"] {
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(100, 116, 139, 0.4) rgba(241, 245, 249, 0.4);
+  scroll-behavior: smooth;
+}
+
+.horizontal-scrollable.is-dragging,
+.tax-nav-tabs.is-dragging,
+.income-ai-tabs-nav.is-dragging,
+.floating-tabs-container.is-dragging,
+.tax-persona-tabs.is-dragging,
+.filter-bar.is-dragging,
+.investment-filter-controls.is-dragging,
+.table-wrap.is-dragging {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Modern, sleek, draggable horizontal scrollbar */
+.horizontal-scrollable::-webkit-scrollbar,
+.tax-nav-tabs::-webkit-scrollbar,
+.income-ai-tabs-nav::-webkit-scrollbar,
+.floating-tabs-container::-webkit-scrollbar,
+.tax-persona-tabs::-webkit-scrollbar,
+.filter-bar::-webkit-scrollbar,
+.investment-filter-controls::-webkit-scrollbar,
+.table-wrap::-webkit-scrollbar,
+div[style*="overflow-x: auto"]::-webkit-scrollbar,
+div[style*="overflow-x:auto"]::-webkit-scrollbar {
+  height: 6px !important;
+  display: block !important;
+}
+
+.horizontal-scrollable::-webkit-scrollbar-track,
+.tax-nav-tabs::-webkit-scrollbar-track,
+.income-ai-tabs-nav::-webkit-scrollbar-track,
+.floating-tabs-container::-webkit-scrollbar-track,
+.tax-persona-tabs::-webkit-scrollbar-track,
+.filter-bar::-webkit-scrollbar-track,
+.investment-filter-controls::-webkit-scrollbar-track,
+.table-wrap::-webkit-scrollbar-track,
+div[style*="overflow-x: auto"]::-webkit-scrollbar-track,
+div[style*="overflow-x:auto"]::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.6) !important;
+  border-radius: 999px !important;
+}
+
+.horizontal-scrollable::-webkit-scrollbar-thumb,
+.tax-nav-tabs::-webkit-scrollbar-thumb,
+.income-ai-tabs-nav::-webkit-scrollbar-thumb,
+.floating-tabs-container::-webkit-scrollbar-thumb,
+.tax-persona-tabs::-webkit-scrollbar-thumb,
+.filter-bar::-webkit-scrollbar-thumb,
+.investment-filter-controls::-webkit-scrollbar-thumb,
+.table-wrap::-webkit-scrollbar-thumb,
+div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb,
+div[style*="overflow-x:auto"]::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.45) !important;
+  border-radius: 999px !important;
+  transition: background 0.2s ease !important;
+}
+
+.horizontal-scrollable::-webkit-scrollbar-thumb:hover,
+.tax-nav-tabs::-webkit-scrollbar-thumb:hover,
+.income-ai-tabs-nav::-webkit-scrollbar-thumb:hover,
+.floating-tabs-container::-webkit-scrollbar-thumb:hover,
+.tax-persona-tabs::-webkit-scrollbar-thumb:hover,
+.filter-bar::-webkit-scrollbar-thumb:hover,
+.investment-filter-controls::-webkit-scrollbar-thumb:hover,
+.table-wrap::-webkit-scrollbar-thumb:hover,
+div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover,
+div[style*="overflow-x:auto"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 41, 59, 0.75) !important;
+}
+
+/* Floating Navigation Controls (Movable Left & Right Arrows) */
+.h-scroll-container {
+  position: relative !important;
+}
+
+.h-scroll-arrow {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 25 !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.h-scroll-arrow:hover {
+  background: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18) !important;
+  transform: translateY(-50%) scale(1.12) !important;
+}
+
+.h-scroll-arrow:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.h-scroll-arrow.left {
+  left: 6px !important;
+}
+
+.h-scroll-arrow.right {
+  right: 6px !important;
+}
+
+.h-scroll-arrow.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ==========================================================================
+   NAVBAR ICON BUTTONS & FLOATING TOOLTIPS
+   ========================================================================== */
+.top-actions .top-utility.icon-btn,
+.top-actions .call-button.icon-btn {
+  position: relative !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #1e293b !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  overflow: visible !important;
+}
+
+.top-actions .top-utility.icon-btn:hover {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+.top-actions .danger-utility.icon-btn {
+  color: #dc2626 !important;
+  background: rgba(254, 242, 242, 0.85) !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.top-actions .danger-utility.icon-btn:hover {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.3) !important;
+}
+
+.top-actions .call-button.icon-btn {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border: 1px solid #0f172a !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2) !important;
+}
+
+.top-actions .call-button.icon-btn:hover {
+  background: #1e293b !important;
+  color: #38bdf8 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3) !important;
+}
+
+/* Tooltip popup for top navbar buttons */
+.top-actions .icon-btn .btn-tooltip {
+  position: absolute !important;
+  top: calc(100% + 9px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) translateY(4px) !important;
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 5px 10px !important;
+  border-radius: 7px !important;
+  white-space: nowrap !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+  z-index: 1000 !important;
+  letter-spacing: 0.2px !important;
+}
+
+/* Tooltip pointer triangle */
+.top-actions .icon-btn .btn-tooltip::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent transparent #0f172a transparent !important;
+}
+
+.top-actions .icon-btn:hover .btn-tooltip,
+.top-actions .icon-btn:focus-visible .btn-tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateX(-50%) translateY(0) !important;
+}
+
+/* Enhanced Tooltips for Sidebar Navigation Tabs */
+.tab b {
+  position: absolute !important;
+  z-index: 120 !important;
+  left: 52px !important;
+  top: 50% !important;
+  transform: translateY(-50%) translateX(-4px) !important;
+  display: block !important;
+  min-width: max-content !important;
+  padding: 5px 10px !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #f8fafc !important;
+  background: #0f172a !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  white-space: nowrap !important;
+}
+
+.tab b::before {
+  content: "" !important;
+  position: absolute !important;
+  right: 100% !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: transparent #0f172a transparent transparent !important;
+}
+
+.tab:hover b,
+.tab:focus-visible b {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(-50%) translateX(0) !important;
+}
+
+/* ==========================================================================
+   Sidebar & Tab Icons Pixel-Perfect Centering & Alignment
+   ========================================================================== */
+.side-nav {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  padding: 10px 0 !important;
+}
+
+.tab {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  border: none !important;
+  background: transparent !important;
+  color: rgba(17, 24, 32, 0.62) !important;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease !important;
+}
+
+.tab:hover {
+  color: #0f172a !important;
+  background: rgba(15, 23, 42, 0.08) !important;
+  transform: scale(1.08) !important;
+}
+
+.tab.active {
+  color: #ffffff !important;
+  background: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.28) !important;
+}
+
+.tab .tab-icon {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  display: block !important;
+  margin: auto !important;
+  stroke: currentColor !important;
+  stroke-width: 2px !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  flex-shrink: 0 !important;
+  pointer-events: none !important;
+  transition: stroke 0.18s ease !important;
+}
+
+.tab.active .tab-icon {
+  stroke: #ffffff !important;
+}
+
+/* Mobile Bottom Navigation Alignment */
+.mobile-nav {
+  align-items: center !important;
+  justify-content: space-around !important;
+}
+
+.mobile-tab {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  padding: 4px 6px !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.mobile-tab .tab-icon {
+  width: 18px !important;
+  height: 18px !important;
+  stroke: currentColor !important;
+  stroke-width: 2px !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+
+
 

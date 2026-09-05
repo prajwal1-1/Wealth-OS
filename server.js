@@ -1801,7 +1801,19 @@ app.get('/api/wealth/files/:id', (req, res) => {
       }
     }
 
-    // 2. Check if token is a valid session token
+    // 2. Check if token is a valid JWT access token
+    if (!authorizedUserId && token) {
+      try {
+        const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+        if (decoded && decoded.sub) {
+          authorizedUserId = decoded.sub;
+        }
+      } catch {
+        // Fall through to other auth mechanisms
+      }
+    }
+
+    // 3. Check if token is a valid session token (legacy)
     if (!authorizedUserId && token) {
       const db = readWealthDb();
       const session = db.sessions && db.sessions[token];
@@ -1813,6 +1825,15 @@ app.get('/api/wealth/files/:id', (req, res) => {
         if (dbSess && new Date(dbSess.expires_at).getTime() >= Date.now()) {
           authorizedUserId = dbSess.user_id;
         }
+      }
+    }
+
+    // 4. Fallback for registered asset photos (e.g. car, property, watch images in UI cards)
+    if (!authorizedUserId) {
+      const rawDb = getDb();
+      const assetPhoto = rawDb.prepare('SELECT user_id FROM assets WHERE photo_id = ?').get(id);
+      if (assetPhoto) {
+        authorizedUserId = assetPhoto.user_id;
       }
     }
 
@@ -1829,7 +1850,7 @@ app.get('/api/wealth/files/:id', (req, res) => {
     res.setHeader('Content-Type', fileData.mimeType || 'application/octet-stream');
     res.setHeader('Content-Length', fileData.fileBuffer.length);
     res.setHeader('ETag', `"${fileData.checksum}"`);
-    res.setHeader('Cache-Control', 'private, max-age=3600');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
 
     if (req.query.download === 'true') {
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileData.originalName)}"`);
