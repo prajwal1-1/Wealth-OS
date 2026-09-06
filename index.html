@@ -1,274 +1,245 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wealth OS | Personal Wealth Command Center</title>
+  <meta name="description" content="Wealth OS is an enterprise-grade personal wealth operating system with AES-256-GCM encrypted vaults, multi-regime tax optimization, and digital estate succession tracking.">
+  <title>Wealth OS | Zero-Knowledge Personal Wealth Command Center</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2309090b'/><text x='50' y='68' font-family='sans-serif' font-size='55' font-weight='bold' fill='%2310b981' text-anchor='middle'>W</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,800;0,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="wealth-os.css">
-  <style>
-    /* Neo-Brutalist Landing Page */
-    body {
-      background: #fbfaf4;
-      background-image: 
-        linear-gradient(126deg, transparent 0 74%, #9aed68 74% 77%, transparent 77%),
-        radial-gradient(rgba(154, 237, 104, 0.25) 1px, transparent 1px);
-      background-size: 100% 100%, 24px 24px;
-      color: #090909;
-      margin: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      overflow-x: hidden;
-    }
-    .landing-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 32px;
-      border-bottom: 3px solid #111;
-      background: #fbfaf4;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 4px 0 #111;
-    }
-    .landing-nav .logo {
-      font-weight: 900;
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .landing-nav .logo span {
-      width: 32px; height: 32px;
-      background: #9aed68;
-      border: 3px solid #111;
-      border-radius: 50%;
-      box-shadow: 3px 3px 0 #111;
-    }
-    .landing-nav a.btn {
-      background: #fbfaf4;
-      color: #090909;
-      padding: 10px 24px;
-      border: 3px solid #111;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 800;
-      box-shadow: 4px 4px 0 #111;
-      transition: all 0.1s ease;
-    }
-    .landing-nav a.btn:hover {
-      transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0 #111;
-      background: #9aed68;
-    }
-    .landing-nav a.btn:active {
-      transform: translate(4px, 4px);
-      box-shadow: 0 0 0 #111;
-    }
-
-    .hero {
-      min-height: calc(100vh - 80px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 60px 24px;
-    }
-    .hero-badge {
-      background: #fbfaf4;
-      border: 3px solid #111;
-      padding: 8px 16px;
-      border-radius: 99px;
-      font-weight: 800;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      box-shadow: 4px 4px 0 #111;
-      margin-bottom: 24px;
-      display: inline-block;
-    }
-    .hero h1 {
-      font-size: clamp(48px, 8vw, 100px);
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      max-width: 1000px;
-      margin: 0 0 24px 0;
-      text-transform: uppercase;
-    }
-    .hero h1 span {
-      color: #fbfaf4;
-      -webkit-text-stroke: 3px #111;
-      text-shadow: 6px 6px 0 #9aed68;
-    }
-    .hero p {
-      font-size: clamp(18px, 2vw, 24px);
-      color: #5f5f57;
-      font-weight: 600;
-      max-width: 700px;
-      margin: 0 0 48px 0;
-      line-height: 1.5;
-    }
-    .hero .ctas {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .btn-primary {
-      background: #9aed68;
-      color: #111;
-      padding: 16px 36px;
-      border: 3px solid #111;
-      border-radius: 16px;
-      text-decoration: none;
-      font-size: 20px;
-      font-weight: 900;
-      box-shadow: 8px 8px 0 #111;
-      transition: all 0.1s ease;
-      text-transform: uppercase;
-    }
-    .btn-secondary {
-      background: #fbfaf4;
-      color: #111;
-      padding: 16px 36px;
-      border: 3px solid #111;
-      border-radius: 16px;
-      text-decoration: none;
-      font-size: 20px;
-      font-weight: 900;
-      box-shadow: 8px 8px 0 #111;
-      transition: all 0.1s ease;
-      text-transform: uppercase;
-    }
-    .btn-primary:hover, .btn-secondary:hover { 
-      transform: translate(3px, 3px);
-      box-shadow: 5px 5px 0 #111;
-    }
-    .btn-primary:active, .btn-secondary:active {
-      transform: translate(8px, 8px);
-      box-shadow: 0 0 0 #111;
-    }
-
-    .bento {
-      padding: 80px 24px;
-      max-width: 1300px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
-    }
-    .bento-card {
-      background: #fbfaf4;
-      border: 4px solid #111;
-      border-radius: 24px;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-shadow: 12px 12px 0 #111;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-    .bento-card:hover {
-      transform: translate(-4px, -4px);
-      box-shadow: 16px 16px 0 #111;
-    }
-    .bento-card.large {
-      grid-column: span 2;
-      background: #242424;
-      color: #fbfaf4;
-    }
-    .bento-card.large h3 {
-      color: #9aed68;
-    }
-    .bento-card.large p {
-      color: #d2d2ca;
-    }
-    .bento-card .icon-wrapper {
-      width: 64px; height: 64px;
-      background: #9aed68;
-      border: 3px solid #111;
-      border-radius: 16px;
-      box-shadow: 4px 4px 0 #111;
-      margin-bottom: 12px;
-    }
-    .bento-card.large .icon-wrapper {
-      background: #fbfaf4;
-    }
-    .bento-card h3 {
-      font-size: 28px;
-      font-weight: 900;
-      margin: 0;
-      text-transform: uppercase;
-      letter-spacing: -0.02em;
-    }
-    .bento-card p {
-      color: #5f5f57;
-      line-height: 1.5;
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    /* Media Queries for Mobile */
-    @media (max-width: 900px) {
-      .bento {
-        grid-template-columns: 1fr;
-      }
-      .bento-card.large {
-        grid-column: span 1;
-      }
-      .hero h1 {
-        font-size: 56px;
-      }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Inter:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="wealth-os.css?v=6.2">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
+  <section class="auth-screen" id="auth-screen">
+    <div class="auth-brand">
+      <strong>WEALTH OS</strong>
+      <small>Personal wealth operating system</small>
+    </div>
+    <form class="auth-card" id="auth-form">
+      <div class="auth-tabs" role="tablist" aria-label="Authentication mode">
+        <button class="auth-tab active" type="button" data-auth-mode="login">Login</button>
+        <button class="auth-tab" type="button" data-auth-mode="register">Create account</button>
+      </div>
+      <div class="auth-copy">
+        <span id="auth-kicker">Welcome back</span>
+        <h1 id="auth-title">Open your family dashboard.</h1>
+      </div>
+      <label class="register-only">
+        Full name
+        <input name="name" autocomplete="name" placeholder="Prajwal Bharad">
+      </label>
+      <label>
+        Email
+        <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+      </label>
+      <label>
+        Password
+        <input name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters">
+      </label>
+      <p class="auth-error" id="auth-error" role="alert"></p>
+      <button class="auth-submit" type="submit" id="auth-submit">Login</button>
+      <p class="auth-note">Your records are stored on this app server under your account.</p>
+    </form>
+  </section>
 
-  <nav class="landing-nav">
-    <div class="logo"><span></span> Wealth OS</div>
-    <a href="wealth-os.html" class="btn">Login</a>
+  <main class="app-shell locked" id="app-shell">
+    <aside class="app-sidebar">
+      <a class="back-link" href="index.html" aria-label="Back to portfolio">
+        <span aria-hidden="true">&lt;</span> Portfolio
+      </a>
+      <div class="brand-lockup">
+        <div>
+          <strong>WEALTH OS</strong>
+          <small>ALPHA</small>
+        </div>
+      </div>
+      <nav class="side-nav" aria-label="App navigation">
+        <button class="tab active" type="button" data-view="home" aria-current="page" aria-label="Dashboard">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <b>Dashboard</b>
+        </button>
+        <button class="tab" type="button" data-view="assets" aria-label="Assets">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3 8 9l4 12 4-12-3-6"/><path d="M2 9h20"/></svg>
+          <b>Assets</b>
+        </button>
+        <button class="tab" type="button" data-view="incomeStreams" aria-label="Income Streams">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+          <b>Income</b>
+        </button>
+        <button class="tab" type="button" data-view="documents" aria-label="Documents">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <b>Documents</b>
+        </button>
+        <button class="tab" type="button" data-view="taxDocuments" aria-label="Tax Documents">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 6-6"/><circle cx="9.5" cy="9.5" r=".7" fill="currentColor"/><circle cx="14.5" cy="14.5" r=".7" fill="currentColor"/></svg>
+          <b>Tax Documents</b>
+        </button>
+        <button class="tab" type="button" data-view="willVault" aria-label="Will Vault">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+          <b>Will Vault</b>
+        </button>
+        <button class="tab" type="button" data-view="cameras" aria-label="Cameras">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.2-3.5a.5.5 0 0 1 .8.4v8.2a.5.5 0 0 1-.8.4L16 15"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+          <b>Cameras</b>
+        </button>
+        <button class="tab" type="button" data-view="cashflow" aria-label="Cash Flow">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+          <b>Cash Flow</b>
+        </button>
+        <button class="tab" type="button" data-view="reports" aria-label="Reports">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+          <b>Reports</b>
+        </button>
+        <button class="tab" type="button" data-view="ai" aria-label="AI Advisor">
+          <svg class="tab-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+          <b>Advisor</b>
+        </button>
+      </nav>
+      <div class="user-card">
+        <span id="user-initials">U</span>
+        <div>
+          <strong id="user-name">User</strong>
+          <small id="user-email">Signed in</small>
+        </div>
+      </div>
+      <button class="logout-button" id="logout-button" type="button">Logout</button>
+    </aside>
+
+    <section class="workspace">
+      <header class="workspace-top">
+        <div>
+          <span class="eyebrow" id="view-label">Home</span>
+          <h1 id="screen-title">Dashboard</h1>
+        </div>
+        <div class="top-actions">
+          <label class="search-box" aria-label="Search records">
+            <input id="global-search" type="search" placeholder="Search assets, docs, loans...">
+          </label>
+          <span class="save-state" id="save-state">Saved</span>
+          <button class="secondary-action top-utility icon-btn" id="export-data" type="button" aria-label="Export Data">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span class="btn-tooltip">Export Data</span>
+          </button>
+          <button class="secondary-action top-utility icon-btn" id="import-data" type="button" aria-label="Import Data">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span class="btn-tooltip">Import Data</span>
+          </button>
+          <button class="secondary-action top-utility danger-utility icon-btn" id="reset-data" type="button" aria-label="Start Fresh / Reset Data">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+            <span class="btn-tooltip">Start Fresh</span>
+          </button>
+          <button class="call-button icon-btn" id="ask-ai-shortcut" type="button" aria-label="Ask AI Advisor">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+            <span class="btn-tooltip">Ask AI</span>
+          </button>
+        </div>
+      </header>
+      <input class="hidden-file" id="import-file" type="file" accept="application/json,text/csv,.json,.csv">
+
+      <section class="summary-strip" aria-label="Financial summary">
+        <div>
+          <span>Net Worth</span>
+          <strong id="hero-net-worth">INR 0</strong>
+        </div>
+        <div>
+          <span>Total Assets</span>
+          <strong id="summary-assets">INR 0</strong>
+        </div>
+        <div>
+          <span>Documents</span>
+          <strong id="summary-documents">0</strong>
+        </div>
+        <div>
+          <span>Cash Balance</span>
+          <strong id="summary-cash">INR 0</strong>
+        </div>
+      </section>
+
+      <div class="content-grid">
+        <section class="main-panel">
+          <div class="app-actions" id="app-actions"></div>
+          <div class="module-grid" id="module-grid"></div>
+          <div class="app-list" id="app-list"></div>
+        </section>
+        <aside class="insight-panel" aria-label="Advisor and timeline">
+          <div class="advisor-card">
+            <span>Simple guide</span>
+            <strong id="advisor-question">What should I add first?</strong>
+            <p id="advisor-answer">Start with one big purchase, then attach its documents.</p>
+          </div>
+          <div class="timeline-card">
+            <span>Wealth timeline</span>
+            <ul id="timeline-list"></ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <nav class="mobile-nav" aria-label="Mobile app navigation">
+    <button class="mobile-tab active" type="button" data-view="home"><span class="nav-icon home-icon"></span><b>Home</b></button>
+    <button class="mobile-tab" type="button" data-view="assets"><span class="nav-icon chart-icon"></span><b>Assets</b></button>
+    <button class="mobile-tab" type="button" data-view="incomeStreams"><span class="nav-icon chart-icon"></span><b>Income</b></button>
+    <button class="mobile-tab" type="button" data-view="documents"><span class="nav-icon doc-icon"></span><b>Docs</b></button>
+    <button class="mobile-tab" type="button" data-view="taxDocuments"><span class="nav-icon doc-icon"></span><b>Tax</b></button>
+    <button class="mobile-tab" type="button" data-view="cashflow"><span class="nav-icon chart-icon"></span><b>Flow</b></button>
+    <button class="mobile-tab" type="button" data-view="reports"><span class="nav-icon chart-icon"></span><b>Reports</b></button>
+    <button class="mobile-tab" type="button" data-view="ai"><span class="nav-icon ai-icon"></span><b>AI</b></button>
   </nav>
 
-  <section class="hero">
-    <div class="hero-badge">Buildathon 2024</div>
-    <h1>The Zero-Knowledge <br><span>Family Office</span></h1>
-    <p>Consolidate your global assets, manage tax regimes, and secure your digital estate with AES-256-GCM envelope encryption.</p>
-    <div class="ctas">
-      <a href="wealth-os.html" class="btn-primary">Launch App</a>
-      <a href="https://razorpay.com/buildathon/" class="btn-secondary" target="_blank">Razorpay Buildathon</a>
-    </div>
-  </section>
+  <dialog class="entry-modal" id="entry-modal">
+    <form method="dialog" class="entry-card" id="entry-form">
+      <div class="entry-head">
+        <div>
+          <span id="entry-kicker">Add item</span>
+          <strong id="entry-title">New record</strong>
+        </div>
+        <button class="icon-button" value="cancel" type="button" id="close-modal" aria-label="Close">x</button>
+      </div>
+      <div class="entry-fields" id="entry-fields"></div>
+      <div class="entry-actions">
+        <button class="danger-button" type="button" id="delete-record">Delete</button>
+        <button class="ghost-button" value="cancel" type="button" id="cancel-modal">Cancel</button>
+        <button class="save-button" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
 
-  <section class="bento">
-    <div class="bento-card large">
-      <div class="icon-wrapper"></div>
-      <h3>Multi-Asset Consolidation</h3>
-      <p>Track real estate, luxury watches, private equity, and global cash balances in a single, unified pane of glass.</p>
+  <dialog class="entry-modal preview-modal" id="preview-modal">
+    <div class="entry-card preview-card">
+      <div class="entry-head">
+        <div>
+          <span>Saved file</span>
+          <strong id="preview-title">Document preview</strong>
+        </div>
+        <button class="icon-button" type="button" id="close-preview" aria-label="Close">x</button>
+      </div>
+      <div class="preview-body" id="preview-body"></div>
     </div>
-    <div class="bento-card">
-      <div class="icon-wrapper"></div>
-      <h3>Military Vault</h3>
-      <p>Your documents are encrypted client-side. We cannot read your wills, tax returns, or deeds.</p>
-    </div>
-    <div class="bento-card">
-      <div class="icon-wrapper"></div>
-      <h3>AI Tax Engine</h3>
-      <p>Connect your CA. Let our engine optimize capital gains across international jurisdictions instantly.</p>
-    </div>
-    <div class="bento-card large">
-      <div class="icon-wrapper"></div>
-      <h3>Automated Succession</h3>
-      <p>Configure dead-man switches and digital trusts. Your wealth securely transfers to your beneficiaries without probate.</p>
-    </div>
-  </section>
+  </dialog>
 
+  <script src="js/config.js?v=6.0"></script>
+  <script src="js/state_api_utils.js?v=6.0"></script>
+  <script src="js/data-sync.js?v=6.0"></script>
+  <script src="js/ui-ai-parsing.js?v=6.0"></script>
+  <script src="js/ui-assets_dash.js?v=6.0"></script>
+  <script src="js/ui-cashflow.js?v=6.0"></script>
+  <script src="js/ui-charts.js?v=6.0"></script>
+  <script src="js/ui-tax-charts.js?v=6.0"></script>
+  <script src="js/ui-tax-integration.js?v=6.0"></script>
+  <script src="js/ui-tax-profile.js?v=6.0"></script>
+  <script src="js/ui-tax.js?v=6.0"></script>
+  <script src="js/ui-will-vault.js?v=6.0"></script>
+  <script src="js/ui-cameras.js?v=6.0"></script>
+  <script src="js/ui-income.js?v=6.0"></script>
+  <script src="js/ui-documents.js?v=6.0"></script>
+  <script src="js/ui-reports.js?v=6.0"></script>
+  <script src="js/ui-ai-advisor.js?v=6.0"></script>
+  <script src="js/app.js?v=6.0"></script>
+  <script src="js/ui-horizontal-scroll.js?v=6.0"></script>
+  <script src="js/ui-inspira.js?v=6.0"></script>
 </body>
 </html>
