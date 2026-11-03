@@ -91,6 +91,7 @@ function getCodicilDraft() {
 // ── Main View Router ─────────────────────────────────────────
 
 async function renderWillVault() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   await fetchWillVaultState();
 
   grid.innerHTML = `
@@ -116,9 +117,11 @@ async function renderWillVault() {
   else if (currentVaultView === 'digitalLegacy') list.innerHTML = renderDigitalLegacyView();
   else if (currentVaultView === 'nominee') list.innerHTML = renderNomineeView();
   else if (currentVaultView === 'admin') list.innerHTML = renderAdminView();
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 window.switchVaultView = (view) => {
+  if (typeof scrollToTop === 'function') scrollToTop();
   currentVaultView = view;
   renderWillVault();
 };
@@ -550,6 +553,7 @@ function renderWillBuilderView() {
 }
 
 window.setWillStep = (step) => {
+  if (typeof scrollToTop === 'function') scrollToTop();
   willBuilderStep = step;
   renderWillVault();
 };

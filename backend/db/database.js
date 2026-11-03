@@ -696,7 +696,7 @@ function saveUserDataSync(d, userId, data, savedBy) {
         shortText(a.brand, 80) || null, shortText(a.model, 80) || null, shortText(a.referenceNumber, 80) || null,
         shortText(a.serialNumber, 80) || null, shortText(a.watchBoxPapers, 80) || null, shortText(a.watchMarketJson, 4000) || null,
         cleanNumber(a.year) || null, cleanNumber(a.odometer), shortText(a.registrationNumber, 50) || null,
-        shortText(a.area, 80) || null, shortText(a.condition, 40) || null, shortText(a.hasLoan, 20) || null,
+        shortText(a.area, 80) || null, shortText(a.condition, 40) || null, shortText(a.hasLoan, 60) || (cleanNumber(a.loanAmount) > 0 ? 'Yes (Active Loan)' : null),
         cleanNumber(a.loanAmount), cleanNumber(a.downPayment), cleanNumber(a.interestRate),
         cleanNumber(a.loanTenureYears), cleanDate(a.loanStartDate) || null, cleanNumber(a.emiAmount),
         shortText(a.loanType, 40) || null, shortText(a.source, 80) || 'Manual', shortText(a.valuationBasis, 520) || null,

@@ -13306,3 +13306,221 @@ div[style*="overflow-x:auto"]::-webkit-scrollbar-thumb:hover {
 
 
 
+
+/* ==============================================================
+   BRUTALIST SKILL: ANALYTICS DASHBOARD OVERRIDES
+   Apply heavy borders, extreme shadows, and distinct backgrounds
+   ============================================================== */
+
+.bottom-kpi-item, 
+.analytics-cashflow-card, 
+.analytics-trend-card, 
+.analytics-alloc-card,
+.analytics-bottom-kpi > div,
+.tax-profile-summary,
+.tax-breakdown-card {
+  background: #fbfaf4 !important;
+  border: 3px solid #111 !important;
+  border-radius: 16px !important;
+  box-shadow: 6px 6px 0 #111 !important;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1) !important;
+}
+
+.bottom-kpi-item:hover, 
+.analytics-cashflow-card:hover {
+  transform: translate(-3px, -3px) !important;
+  box-shadow: 9px 9px 0 #111 !important;
+}
+
+/* Make one of them pop with the Mint Green */
+.analytics-cashflow-card {
+  background: #9aed68 !important;
+}
+
+.analytics-cashflow-card h3,
+.analytics-cashflow-card .flow-metric {
+  color: #111 !important;
+  font-weight: 900 !important;
+}
+
+/* Monthly Cashflow Progress Bars - Brutalize them */
+.flow-bar-bg {
+  background: #fff !important;
+  border: 2px solid #111 !important;
+  border-radius: 8px !important;
+}
+.flow-bar-fill {
+  border-right: 2px solid #111 !important;
+}
+
+/* Fix the dark Tax card shown in the screenshot to match the Brutalist aesthetic */
+.tax-profile-summary, .tax-breakdown-card, [style*="background: #0f172a"] {
+  background: #111 !important;
+  color: #9aed68 !important;
+  border: 3px solid #111 !important;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.5) !important;
+}
+.tax-profile-summary span, .tax-profile-summary p, [style*="background: #0f172a"] * {
+  color: #fbfaf4 !important;
+}
+.tax-profile-summary strong, [style*="background: #0f172a"] strong {
+  color: #9aed68 !important;
+}
+
+/* Typography on KPI items */
+.bottom-kpi-item span {
+  color: #111 !important;
+  font-weight: 900 !important;
+}
+.bottom-kpi-item strong {
+  color: #9aed68 !important;
+  -webkit-text-stroke: 1px #111;
+  text-shadow: 2px 2px 0 #111;
+  font-size: 32px !important;
+}
+.bottom-kpi-item p {
+  color: #111 !important;
+  font-weight: 600 !important;
+}
+/* Neo-Brutalist Tax Card specific override */
+.wellness-mini-card.tax-card {
+  background: #111 !important;
+  color: #9aed68 !important;
+  border: 3px solid #111 !important;
+  box-shadow: 6px 6px 0 #111 !important;
+}
+.wellness-mini-card.tax-card span, 
+.wellness-mini-card.tax-card p {
+  color: #fbfaf4 !important;
+}
+.wellness-mini-card.tax-card strong {
+  color: #9aed68 !important;
+  -webkit-text-stroke: 0px;
+  text-shadow: none;
+}
+.wellness-mini-card.tax-card button {
+  background: #9aed68 !important;
+  color: #111 !important;
+  font-weight: 800 !important;
+  border: 2px solid #111 !important;
+  box-shadow: 3px 3px 0 #111 !important;
+}
+/* ==============================================================
+   RESPONSIVE FLUIDITY & ZOOM-OUT (80% ZOOM / WIDE VIEWPORT) FIX
+   ============================================================== */
+
+body {
+  min-height: 100vh !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding: 24px !important;
+  box-sizing: border-box !important;
+}
+
+.app-shell {
+  width: min(1640px, calc(100vw - 48px)) !important;
+  max-width: 1640px !important;
+  min-height: calc(100vh - 48px) !important;
+  margin: 0 auto !important;
+  grid-template-columns: 84px minmax(0, 1fr) !important;
+}
+
+.workspace {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Fluid scaling on wide screens / 80% zoom */
+@media (min-width: 1400px) {
+  .app-shell {
+    width: min(1760px, calc(100vw - 64px)) !important;
+    max-width: 1760px !important;
+  }
+}
+/* ==============================================================
+   NATIVE 100% ZOOM SCALE TO MATCH 80% VIEWPORT RATIO
+   ============================================================== */
+
+@media (min-width: 900px) {
+  .app-shell {
+    zoom: 0.82 !important;
+    width: min(1560px, calc(100vw - 32px)) !important;
+    max-width: 1560px !important;
+    margin: 0 auto !important;
+  }
+}
+/* ==============================================================
+   EDGE-TO-EDGE FULL-WIDTH SCREEN FIX (REMOVE EMPTY SIDE MARGINS)
+   ============================================================== */
+
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-height: 100vh !important;
+  background: var(--warm-shell) !important;
+  overflow-x: hidden !important;
+}
+
+.app-shell {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  grid-template-columns: 88px minmax(0, 1fr) !important;
+}
+
+.app-sidebar {
+  border-radius: 0 !important;
+  height: 100vh !important;
+  top: 0 !important;
+}
+
+.workspace {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 24px 36px !important;
+}
+/* ==============================================================
+   OFFLINE AI ENGINE (WebLLM / WebGPU) UI STYLING
+   ============================================================== */
+
+.streaming-cursor {
+  display: inline-block;
+  color: #10b981;
+  font-weight: 900;
+  animation: blinkCursor 0.8s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.chat-message-bubble {
+  word-break: break-word;
+  line-height: 1.55;
+}
+
+.chat-message-bubble h3, 
+.chat-message-bubble h4 {
+  margin: 10px 0 6px !important;
+  color: #0f172a !important;
+}
+
+.chat-message-bubble ul, 
+.chat-message-bubble ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.chat-message-bubble li {
+  margin-bottom: 4px;
+}

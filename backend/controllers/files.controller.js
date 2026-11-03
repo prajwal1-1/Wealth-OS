@@ -146,6 +146,24 @@ exports.getFile = (req, res) => {
       }
     }
 
+    // 4. Fallback for registered documents
+    if (!authorizedUserId) {
+      const db = getDb();
+      const docRecord = db.prepare('SELECT user_id FROM documents WHERE file_id = ?').get(fileId);
+      if (docRecord) {
+        authorizedUserId = docRecord.user_id;
+      }
+    }
+
+    // 5. Fallback for vault files directly
+    if (!authorizedUserId) {
+      const db = getDb();
+      const vaultRecord = db.prepare('SELECT user_id FROM vault_files WHERE id = ?').get(fileId);
+      if (vaultRecord) {
+        authorizedUserId = vaultRecord.user_id;
+      }
+    }
+
     if (!authorizedUserId) {
       return res.status(401).json({ error: 'Authentication required to access this file.' });
     }

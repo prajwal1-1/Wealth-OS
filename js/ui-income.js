@@ -384,6 +384,7 @@ function getComprehensiveEmiDetails() {
 // ── Main Page Render ──────────────────────────────────────
 
 function renderIncomeStreamsPage() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const summary = incomeStreamsSummary();
   const allStreams = state.incomeStreams || [];
 
@@ -459,6 +460,7 @@ function renderIncomeStreamsPage() {
     setupIncomeDonutChart(summary);
     setupIncomeForecastChart(summary);
   }, 40);
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 // ── Stress Test Alert Banner ──────────────────────────────
@@ -2021,26 +2023,31 @@ function clearIncomeSearch() {
 }
 
 function handleCategoryFilterChange(event) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeCategoryFilter = event.target.value;
   renderIncomeStreamsPage();
 }
 
 function handleTypeFilterChange(event) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeTypeFilter = event.target.value;
   renderIncomeStreamsPage();
 }
 
 function handleSortChange(event) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeSortBy = event.target.value;
   renderIncomeStreamsPage();
 }
 
 function filterByCategory(cat) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeCategoryFilter = cat;
   renderIncomeStreamsPage();
 }
 
 function resetIncomeFilters() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeCategoryFilter = 'all';
   incomeStatusFilter = 'all';
   incomeTypeFilter = 'all';
@@ -2049,21 +2056,25 @@ function resetIncomeFilters() {
 }
 
 function switchIncomeView(mode) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeViewMode = mode;
   renderIncomeStreamsPage();
 }
 
 function switchTaxMode(mode) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeTaxMode = mode;
   renderIncomeStreamsPage();
 }
 
 function toggleIncomeTaxMode() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeTaxMode = incomeTaxMode === 'gross' ? 'net' : 'gross';
   renderIncomeStreamsPage();
 }
 
 function toggleIncomeStressTest() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   incomeStressTestActive = !incomeStressTestActive;
   renderIncomeStreamsPage();
   showToast(incomeStressTestActive ? 'Job-loss stress test activated.' : 'Stress test deactivated.');

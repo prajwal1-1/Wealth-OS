@@ -29,8 +29,10 @@ window.syncAssetSpinnyValue = function(assetId) {
 };
 
 function renderAssets() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   if (activeAssetCategory && assetCategoryViews[activeAssetCategory]) {
     renderAssetCategory(activeAssetCategory);
+    if (typeof scrollToTop === 'function') scrollToTop();
     return;
   }
   const data = totals();
@@ -50,17 +52,7 @@ function renderAssets() {
     <!-- Financed Assets & Ongoing Loans Tracker -->
     ${renderFinancedAssetsLoanCard()}
 
-    <!-- Row: Passive Cash Flow Yield & CFA Asset Allocation Drift (2 Equal Columns) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin-bottom: 16px;">
-      ${renderAssetPassiveCashflowEngine()}
-      ${renderAssetAllocationRebalancer()}
-    </div>
 
-    <!-- Row: Succession Protection Radar & Collateral Borrowing Power (2 Equal Columns) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin-bottom: 16px;">
-      ${renderAssetSuccessionRadar()}
-      ${renderAssetCollateralBorrowingPower()}
-    </div>
 
     ${assetIntelligencePanel()}
     ${assetVisualDashboard()}
@@ -71,6 +63,7 @@ function renderAssets() {
     ${sectionHeader("Saved Assets", `${filteredAssets.length} shown`)}
     ${assetPortfolioCards(filteredAssets)}
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 window.toggleFinancedAssetsExpansion = function() {
@@ -92,56 +85,71 @@ window.toggleFinancedAssetsExpansion = function() {
 };
 
 function renderSingleFinancedAssetCard(item) {
+  const isHighLtv = item.ltv > 70;
+  const ltvColor = isHighLtv ? '#dc2626' : (item.ltv > 50 ? '#d97706' : '#16a34a');
+
   return `
-    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; transition: all 0.15s ease;">
-      <!-- Row 1: Header & Value -->
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; transition: all 0.15s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+      <!-- Row 1: Header & Valuation Telemetry -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
         <div>
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-            <strong style="font-size: 14.5px; color: #0f172a;">${escapeHtml(item.name)}</strong>
-            <span style="background: white; border: 1px solid #cbd5e1; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 750; color: #475569;">${escapeHtml(item.type)}</span>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <strong style="font-size: 15px; font-weight: 800; color: #09090b; letter-spacing: -0.01em;">${escapeHtml(item.name)}</strong>
+            <span style="background: #f4f4f5; border: 1px solid #e4e4e7; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #52525b; font-family: ui-monospace, SFMono-Regular, monospace;">${escapeHtml(item.type)}</span>
           </div>
-          <small style="color: #64748b; font-size: 11px;">Current Market Value: <b>${money(item.currentValue)}</b> • Purchase Price: ${money(item.purchasePrice)}</small>
+          <div style="display: flex; align-items: center; gap: 12px; font-size: 11.5px; color: #71717a; font-family: ui-monospace, SFMono-Regular, monospace;">
+            <span>MKT: <b style="color: #18181b;">${money(item.currentValue)}</b></span>
+            <span style="color: #d4d4d8;">•</span>
+            <span>ACQ: <b style="color: #18181b;">${money(item.purchasePrice)}</b></span>
+            <span style="color: #d4d4d8;">•</span>
+            <span style="color: #16a34a; font-weight: 600;">EQUITY: <b>${money(item.equity)}</b></span>
+          </div>
         </div>
         <div style="text-align: right;">
-          <span style="font-size: 10.5px; color: #64748b; display: block;">Outstanding Loan Balance</span>
-          <strong style="font-size: 16px; color: #dc2626;">${money(item.outstandingLoan)}</strong>
+          <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #71717a; margin-bottom: 2px;">Outstanding Principal</div>
+          <div style="font-size: 18px; font-weight: 900; color: #dc2626; font-family: ui-monospace, SFMono-Regular, monospace; letter-spacing: -0.02em;">${money(item.outstandingLoan)}</div>
         </div>
       </div>
 
-      <!-- Row 2: Loan Progress Bar -->
-      <div style="margin-bottom: 12px;">
-        <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-bottom: 4px;">
-          <span style="color: #16a34a; font-weight: 700;">✓ Principal Repaid: ${money(item.principalPaid)} (${item.repaidPercent}%)</span>
-          <span style="color: #dc2626; font-weight: 700;">Remaining Debt: ${money(item.outstandingLoan)} (${100 - item.repaidPercent}%)</span>
+      <!-- Row 2: Precision Dual Amortization Gauge -->
+      <div style="margin-bottom: 16px; background: #fafafa; border: 1px solid #f4f4f5; border-radius: 6px; padding: 10px 12px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: ui-monospace, SFMono-Regular, monospace; margin-bottom: 6px;">
+          <span style="color: #16a34a; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <span style="width: 7px; height: 7px; border-radius: 2px; background: #16a34a; display: inline-block;"></span>
+            PRINCIPAL REPAID: ${money(item.principalPaid)} (${item.repaidPercent}%)
+          </span>
+          <span style="color: #dc2626; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            REMAINING DEBT: ${money(item.outstandingLoan)} (${100 - item.repaidPercent}%)
+            <span style="width: 7px; height: 7px; border-radius: 2px; background: #dc2626; display: inline-block;"></span>
+          </span>
         </div>
-        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex;">
-          <div style="width: ${item.repaidPercent}%; height: 100%; background: linear-gradient(90deg, #16a34a, #22c55e); border-radius: 99px 0 0 99px;"></div>
-          <div style="width: ${100 - item.repaidPercent}%; height: 100%; background: linear-gradient(90deg, #ef4444, #dc2626); border-radius: 0 99px 99px 0;"></div>
+        <div style="width: 100%; height: 7px; background: #e4e4e7; border-radius: 3px; overflow: hidden; display: flex;">
+          <div style="width: ${item.repaidPercent}%; height: 100%; background: #16a34a; border-right: 1px solid #ffffff;"></div>
+          <div style="width: ${100 - item.repaidPercent}%; height: 100%; background: #dc2626;"></div>
         </div>
       </div>
 
-      <!-- Row 3: 4 Key Metrics Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; background: white; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
-        <div>
-          <span style="font-size: 10px; color: #64748b; display: block;">Original Loan Borrowed</span>
-          <strong style="font-size: 12.5px; color: #0f172a;">${money(item.loanAmount)}</strong>
-          <small style="font-size: 9.5px; color: #94a3b8; display: block;">Down payment: ${money(item.downPayment)}</small>
+      <!-- Row 3: 4 Architectural Metric Cells with Hairline Dividers -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 6px; overflow: hidden;">
+        <div style="padding: 10px 14px; border-right: 1px solid #e4e4e7;">
+          <span style="font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Original Principal</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(item.loanAmount)}</strong>
+          <small style="font-size: 10px; color: #a1a1aa; display: block; margin-top: 2px;">Down: ${money(item.downPayment)}</small>
         </div>
-        <div>
-          <span style="font-size: 10px; color: #64748b; display: block;">Monthly EMI</span>
-          <strong style="font-size: 12.5px; color: #0f172a;">${money(item.emi)}</strong>
-          <small style="font-size: 9.5px; color: #94a3b8; display: block;">Rate: ${item.interestRate}% (${item.loanType})</small>
+        <div style="padding: 10px 14px; border-right: 1px solid #e4e4e7;">
+          <span style="font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Monthly EMI</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(item.emi)}</strong>
+          <small style="font-size: 10px; color: #71717a; display: block; margin-top: 2px;">${item.interestRate}% (${item.loanType})</small>
         </div>
-        <div>
-          <span style="font-size: 10px; color: #64748b; display: block;">EMIs Completed / Left</span>
-          <strong style="font-size: 12.5px; color: #0f172a;">${item.completedEmis} / ${item.tenureMonths} EMIs</strong>
-          <small style="font-size: 9.5px; color: #dc2626; display: block;">${item.remainingMonths} months left</small>
+        <div style="padding: 10px 14px; border-right: 1px solid #e4e4e7;">
+          <span style="font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Tenure Schedule</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${item.completedEmis} / ${item.tenureMonths} <span style="font-size: 10.5px; font-weight: 600; color: #71717a;">EMIs</span></strong>
+          <small style="font-size: 10px; color: #dc2626; font-weight: 600; display: block; margin-top: 2px;">${item.remainingMonths} mos remaining</small>
         </div>
-        <div>
-          <span style="font-size: 10px; color: #64748b; display: block;">Net Equity Owned</span>
-          <strong style="font-size: 12.5px; color: #16a34a;">${money(item.equity)}</strong>
-          <small style="font-size: 9.5px; color: #16a34a; display: block;">LTV: ${item.ltv}%</small>
+        <div style="padding: 10px 14px;">
+          <span style="font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Net Equity & LTV</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #16a34a; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(item.equity)}</strong>
+          <small style="font-size: 10px; font-weight: 700; color: ${ltvColor}; display: block; margin-top: 2px;">LTV: ${item.ltv}%</small>
         </div>
       </div>
     </div>
@@ -154,9 +162,10 @@ function renderFinancedAssetsLoanCard() {
   const financedAssets = [];
 
   nonCash.forEach(asset => {
-    if (isTruthy(asset.hasLoan) && Number(asset.loanAmount || 0) > 0) {
+    if (isAssetFinanced(asset)) {
       const snap = financedAssetSnapshot(asset);
-      financedAssets.push({
+      if (snap.loan.hasLoan && (snap.outstandingLoan > 0 || snap.loan.loanAmount > 0)) {
+        financedAssets.push({
         asset,
         name: asset.name || 'Financed Asset',
         type: asset.type || asset.category || 'Asset',
@@ -178,6 +187,7 @@ function renderFinancedAssetsLoanCard() {
         ltv: snap.currentValue > 0 ? Math.round((snap.outstandingLoan / snap.currentValue) * 100) : 0,
         repaidPercent: snap.loan.loanAmount > 0 ? Math.round((snap.loan.principalPaidToDate / snap.loan.loanAmount) * 100) : 0
       });
+      }
     }
   });
 
@@ -219,19 +229,19 @@ function renderFinancedAssetsLoanCard() {
 
   if (financedAssets.length === 0) {
     return `
-      <div style="background: white; border-radius: 16px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 4px 16px rgba(0,0,0,0.03); margin-bottom: 20px;">
+      <div style="background: #ffffff; border-radius: 10px; padding: 18px 20px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 102, 54, 0.08); display: flex; align-items: center; justify-content: center; font-size: 17px;">
-              💳
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+              <span style="font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #16a34a; background: rgba(22, 163, 74, 0.08); border: 1px solid rgba(22, 163, 74, 0.2); padding: 2px 7px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, monospace;">
+                ● 100% UNENCUMBERED
+              </span>
             </div>
-            <div>
-              <h3 style="margin: 0; font-size: 14.5px; font-weight: 850; color: #0f172a;">Ongoing Loans & Financed Purchases</h3>
-              <p style="margin: 2px 0 0; font-size: 11px; color: #64748b;">100% Unencumbered Portfolio — All assets are fully owned with zero active debt</p>
-            </div>
+            <h3 style="margin: 0; font-size: 15px; font-weight: 900; color: #09090b; letter-spacing: -0.01em;">Ongoing Loans & Financed Purchases</h3>
+            <p style="margin: 2px 0 0; font-size: 11.5px; color: #64748b;">All portfolio assets are fully owned with zero active debt encumbrance</p>
           </div>
-          <span style="font-size: 11px; font-weight: 800; color: #106636; background: rgba(16, 102, 54, 0.08); padding: 4px 10px; border-radius: 99px;">
-            ✓ Debt Free
+          <span style="font-size: 11px; font-weight: 800; color: #15803d; background: #dcfce7; border: 1px solid #bbf7d0; padding: 4px 10px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, monospace;">
+            ✓ ZERO DEBT EXPOSURE
           </span>
         </div>
       </div>
@@ -242,45 +252,47 @@ function renderFinancedAssetsLoanCard() {
   const remainingLoans = financedAssets.slice(1);
 
   return `
-    <div style="background: white; border-radius: 16px; padding: 22px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 4px 16px rgba(0,0,0,0.03); margin-bottom: 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 14px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(220, 38, 38, 0.08); display: flex; align-items: center; justify-content: center; font-size: 20px;">
-            💳
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 22px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+      <!-- Header Row with Kicker and Stat Group -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span style="font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; background: #f8fafc; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, monospace;">LIABILITY TELEMETRY</span>
           </div>
-          <div>
-            <h3 style="margin: 0; font-size: 16px; font-weight: 900; color: #0f172a;">Ongoing Loans & Financed Purchases</h3>
-            <p style="margin: 2px 0 0; font-size: 11.5px; color: #64748b;">Track remaining principal, monthly EMIs, and net asset equity</p>
-          </div>
+          <h3 style="margin: 0; font-size: 16px; font-weight: 900; color: #09090b; letter-spacing: -0.01em;">Ongoing Loans & Financed Purchases</h3>
+          <p style="margin: 3px 0 0; font-size: 11.5px; color: #64748b;">Active debt amortization, monthly EMI obligations, and unencumbered asset equity</p>
         </div>
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <div style="background: #f8fafc; padding: 6px 12px; border-radius: 8px; font-size: 11.5px;">
-            <span style="color: #64748b;">Total Debt:</span> <strong style="color: #dc2626;">${money(totalOutstandingDebt)}</strong>
+
+        <!-- 3-Chip Consolidated Stat Block -->
+        <div style="display: flex; gap: 0; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 6px; overflow: hidden;">
+          <div style="padding: 7px 14px; border-right: 1px solid #e4e4e7;">
+            <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Total Debt</span>
+            <strong style="font-size: 13px; font-weight: 900; color: #dc2626; font-family: ui-monospace, SFMono-Regular, monospace;">${money(totalOutstandingDebt)}</strong>
           </div>
-          <div style="background: #f8fafc; padding: 6px 12px; border-radius: 8px; font-size: 11.5px;">
-            <span style="color: #64748b;">Monthly EMI:</span> <strong style="color: #0f172a;">${money(totalMonthlyEmi)} / mo</strong>
+          <div style="padding: 7px 14px; border-right: 1px solid #e4e4e7;">
+            <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Monthly EMI</span>
+            <strong style="font-size: 13px; font-weight: 900; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace;">${money(totalMonthlyEmi)} <span style="font-size: 10px; font-weight: 600; color: #71717a;">/ mo</span></strong>
           </div>
-          <div style="background: rgba(16, 102, 54, 0.08); padding: 6px 12px; border-radius: 8px; font-size: 11.5px;">
-            <span style="color: #106636;">Net Owned Equity:</span> <strong style="color: #106636;">${money(totalNetEquity)}</strong>
+          <div style="padding: 7px 14px;">
+            <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #16a34a; display: block;">Net Owned Equity</span>
+            <strong style="font-size: 13px; font-weight: 900; color: #16a34a; font-family: ui-monospace, SFMono-Regular, monospace;">${money(totalNetEquity)}</strong>
           </div>
         </div>
       </div>
 
-      <!-- 1st Loan (Always Visible) -->
-      <div style="display: flex; flex-direction: column; gap: 14px;">
+      <!-- Loan Cards Stack -->
+      <div style="display: flex; flex-direction: column; gap: 12px;">
         ${renderSingleFinancedAssetCard(primaryLoan)}
 
         ${remainingLoans.length > 0 ? `
-          <!-- Remaining Loans (Hidden behind toggle button) -->
-          <div id="financed-assets-extended-list" style="display: none; flex-direction: column; gap: 14px;">
+          <div id="financed-assets-extended-list" style="display: none; flex-direction: column; gap: 12px;">
             ${remainingLoans.map(renderSingleFinancedAssetCard).join('')}
           </div>
 
-          <!-- Little Button to Toggle the Rest of the Ongoing Loans -->
           <div style="display: flex; justify-content: center; margin-top: 4px;">
-            <button type="button" id="toggle-financed-assets-btn" onclick="toggleFinancedAssetsExpansion()" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 99px; border: 1px solid rgba(0,0,0,0.1); background: #f8fafc; color: #0f172a; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s ease;">
-              <span>+ View ${remainingLoans.length} More Ongoing Loan${remainingLoans.length > 1 ? 's' : ''}</span>
-              <span id="financed-toggle-icon" style="font-size: 10px; transition: transform 0.2s ease;">▼</span>
+            <button type="button" id="toggle-financed-assets-btn" onclick="toggleFinancedAssetsExpansion()" style="display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; border-radius: 6px; border: 1px solid #e2e8f0; background: #ffffff; color: #09090b; font-size: 11px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, monospace; letter-spacing: 0.04em; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <span>+ VIEW ${remainingLoans.length} MORE ONGOING LOAN${remainingLoans.length > 1 ? 'S' : ''}</span>
+              <span id="financed-toggle-icon" style="font-size: 9px; transition: transform 0.2s ease;">▼</span>
             </button>
           </div>
         ` : ''}
@@ -312,7 +324,7 @@ function renderAssetPassiveCashflowEngine() {
     }
   });
 
-  // Cash interest (Kotak / Savings Bank 3.5%)
+  // Cash interest (Savings Bank ~3.5%)
   interestIncomeAnnual += cash * 0.035;
 
   const totalPassiveAnnual = rentalIncomeAnnual + dividendIncomeAnnual + interestIncomeAnnual;
@@ -321,40 +333,48 @@ function renderAssetPassiveCashflowEngine() {
   const freedomScore = baselineMonthlyBurn > 0 ? Math.min(100, Math.round((totalPassiveMonthly / baselineMonthlyBurn) * 100)) : 0;
 
   return `
-    <div style="background: white; border-radius: 14px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <h3 style="margin: 0; font-size: 15px; font-weight: 850;">Passive Cash Flow & Freedom Score</h3>
-          <span style="font-size: 10.5px; font-weight: 750; padding: 3px 8px; border-radius: 99px; background: rgba(16, 102, 54, 0.08); color: #106636;">
-            ${freedomScore >= 100 ? 'Financially Independent' : `${freedomScore}% Freedom Score`}
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px;">
+          <div>
+            <span style="font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-family: ui-monospace, SFMono-Regular, monospace;">YIELD & LIQUIDITY TELEMETRY</span>
+            <h3 style="margin: 2px 0 0; font-size: 15px; font-weight: 900; color: #09090b; letter-spacing: -0.01em;">Passive Cash Flow & Freedom Score</h3>
+          </div>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px; background: rgba(22, 163, 74, 0.08); border: 1px solid rgba(22, 163, 74, 0.2); color: #15803d; font-family: ui-monospace, SFMono-Regular, monospace; white-space: nowrap;">
+            ${freedomScore >= 100 ? '● FINANCIALLY INDEPENDENT' : `● ${freedomScore}% FREEDOM SCORE`}
           </span>
         </div>
-        <p style="margin: 0 0 12px; font-size: 11px; color: #777;">Yield generated by assets without touching principal capital</p>
+        <p style="margin: 2px 0 16px; font-size: 11.5px; color: #71717a;">Autonomous yield generated across balance sheet without liquidating principal</p>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px;">
-        <div style="background: rgba(0,0,0,0.015); padding: 9px 10px; border-radius: 10px;">
-          <span style="font-size: 10px; color: #777; display: block;">Rental Yield</span>
-          <strong style="font-size: 14px; color: #111;">${money(Math.round(rentalIncomeAnnual / 12))}/mo</strong>
-          <small style="font-size: 9.5px; color: #888; display: block;">~3.5% p.a.</small>
+      <!-- 3-Column Structured Breakdown -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 6px; overflow: hidden; margin-bottom: 14px;">
+        <div style="padding: 11px 12px; border-right: 1px solid #e4e4e7;">
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Rental Yield</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(Math.round(rentalIncomeAnnual / 12))}<span style="font-size: 10px; font-weight: 600; color: #71717a;">/mo</span></strong>
+          <small style="font-size: 9.5px; color: #a1a1aa; display: block; margin-top: 2px;">~3.5% p.a. cap</small>
         </div>
-        <div style="background: rgba(0,0,0,0.015); padding: 9px 10px; border-radius: 10px;">
-          <span style="font-size: 10px; color: #777; display: block;">Dividends</span>
-          <strong style="font-size: 14px; color: #111;">${money(Math.round(dividendIncomeAnnual / 12))}/mo</strong>
-          <small style="font-size: 9.5px; color: #888; display: block;">~1.5% p.a.</small>
+        <div style="padding: 11px 12px; border-right: 1px solid #e4e4e7;">
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Dividends</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(Math.round(dividendIncomeAnnual / 12))}<span style="font-size: 10px; font-weight: 600; color: #71717a;">/mo</span></strong>
+          <small style="font-size: 9.5px; color: #a1a1aa; display: block; margin-top: 2px;">~1.5% p.a. eq</small>
         </div>
-        <div style="background: rgba(0,0,0,0.015); padding: 9px 10px; border-radius: 10px;">
-          <span style="font-size: 10px; color: #777; display: block;">Interest Yield</span>
-          <strong style="font-size: 14px; color: #111;">${money(Math.round(interestIncomeAnnual / 12))}/mo</strong>
-          <small style="font-size: 9.5px; color: #888; display: block;">FD + Bank</small>
+        <div style="padding: 11px 12px;">
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Fixed Income</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(Math.round(interestIncomeAnnual / 12))}<span style="font-size: 10px; font-weight: 600; color: #71717a;">/mo</span></strong>
+          <small style="font-size: 9.5px; color: #a1a1aa; display: block; margin-top: 2px;">FD & Bank</small>
         </div>
       </div>
 
-      <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 12px 14px; border-radius: 10px; color: white; display: flex; justify-content: space-between; align-items: center;">
+      <!-- Executive Carbon Footer -->
+      <div style="background: #09090b; border: 1px solid #27272a; padding: 12px 16px; border-radius: 6px; color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <span style="font-size: 10.5px; color: #94a3b8; display: block;">Total Estimated Passive Inflow</span>
-          <strong style="font-size: 17px; color: white;">${money(totalPassiveMonthly)} / month</strong>
-          <small style="font-size: 10px; color: #cbd5e1; display: block; margin-top: 1px;">Covers ${freedomScore}% of ${money(baselineMonthlyBurn)} monthly living expenses</small>
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #a1a1aa; display: block;">Total Passive Inflow</span>
+          <strong style="font-size: 16px; font-weight: 900; color: #ffffff; font-family: ui-monospace, SFMono-Regular, monospace; letter-spacing: -0.01em;">${money(totalPassiveMonthly)} <span style="font-size: 11px; font-weight: 500; color: #a1a1aa;">/ month</span></strong>
+          <small style="font-size: 9.5px; color: #71717a; display: block; margin-top: 2px;">Covers ${freedomScore}% of baseline living expenses (${money(baselineMonthlyBurn)}/mo)</small>
+        </div>
+        <div style="text-align: right; background: #18181b; border: 1px solid #27272a; padding: 5px 10px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 10px; font-weight: 800; color: #34d399; letter-spacing: 0.04em;">
+          ${(totalPassiveMonthly / Math.max(1, baselineMonthlyBurn)).toFixed(1)}x RUNWAY
         </div>
       </div>
     </div>
@@ -390,56 +410,56 @@ function renderAssetAllocationRebalancer() {
   const debtPct = Math.round(((debtVal + cash) / totalPortfolio) * 100);
   const goldPct = Math.round((goldVal / totalPortfolio) * 100);
 
+  const targets = [
+    { name: 'Equities & Funds', target: 45, actual: eqPct, val: equityVal, color: '#2563eb' },
+    { name: 'Real Estate & Land', target: 30, actual: rePct, val: realEstateVal, color: '#059669' },
+    { name: 'Debt, Cash & Reserves', target: 15, actual: debtPct, val: debtVal + cash, color: '#7c3aed' },
+    { name: 'Gold & Precious Metals', target: 10, actual: goldPct, val: goldVal, color: '#d97706' }
+  ];
+
   return `
-    <div style="background: white; border-radius: 14px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <h3 style="margin: 0; font-size: 15px; font-weight: 850;">⚖️ CFA Portfolio Allocation & Drift</h3>
-          <span style="font-size: 10.5px; font-weight: 750; padding: 3px 8px; border-radius: 99px; background: rgba(0,0,0,0.04); color: #111;">Target: Moderate Growth</span>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px;">
+          <div>
+            <span style="font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-family: ui-monospace, SFMono-Regular, monospace;">STRATEGIC ASSET ALLOCATION</span>
+            <h3 style="margin: 2px 0 0; font-size: 15px; font-weight: 900; color: #09090b; letter-spacing: -0.01em;">CFA Portfolio Allocation & Drift</h3>
+          </div>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px; background: #f4f4f5; border: 1px solid #e4e4e7; color: #27272a; font-family: ui-monospace, SFMono-Regular, monospace; white-space: nowrap;">
+            TARGET: MODERATE
+          </span>
         </div>
-        <p style="margin: 0 0 12px; font-size: 11px; color: #777;">Institutional target vs actual portfolio concentration</p>
+        <p style="margin: 2px 0 16px; font-size: 11.5px; color: #71717a;">Active portfolio concentration vs institutional risk benchmark</p>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 7px;">
-        <div>
-          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
-            <span>📈 Equities & Funds (Target: 45%)</span>
-            <strong>${eqPct}% (${money(equityVal)})</strong>
-          </div>
-          <div style="height: 5px; background: rgba(0,0,0,0.05); border-radius: 99px; overflow: hidden;">
-            <div style="width: ${Math.min(100, eqPct)}%; height: 100%; background: #3b82f6;"></div>
-          </div>
-        </div>
+      <div style="display: flex; flex-direction: column; gap: 11px;">
+        ${targets.map(t => {
+          const drift = t.actual - t.target;
+          const driftBadge = drift > 5 
+            ? `<span style="font-size: 9px; font-weight: 800; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; padding: 1px 5px; border-radius: 3px; font-family: ui-monospace, SFMono-Regular, monospace;">+${drift}% OVER</span>`
+            : (drift < -5 
+              ? `<span style="font-size: 9px; font-weight: 800; color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; padding: 1px 5px; border-radius: 3px; font-family: ui-monospace, SFMono-Regular, monospace;">${drift}% UNDER</span>`
+              : `<span style="font-size: 9px; font-weight: 800; color: #15803d; background: #dcfce7; border: 1px solid #bbf7d0; padding: 1px 5px; border-radius: 3px; font-family: ui-monospace, SFMono-Regular, monospace;">OPTIMAL</span>`);
 
-        <div>
-          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
-            <span>🏢 Real Estate & Land (Target: 30%)</span>
-            <strong>${rePct}% (${money(realEstateVal)})</strong>
-          </div>
-          <div style="height: 5px; background: rgba(0,0,0,0.05); border-radius: 99px; overflow: hidden;">
-            <div style="width: ${Math.min(100, rePct)}%; height: 100%; background: #10b981;"></div>
-          </div>
-        </div>
-
-        <div>
-          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
-            <span>🛡️ Debt, Cash & Reserves (Target: 15%)</span>
-            <strong>${debtPct}% (${money(debtVal + cash)})</strong>
-          </div>
-          <div style="height: 5px; background: rgba(0,0,0,0.05); border-radius: 99px; overflow: hidden;">
-            <div style="width: ${Math.min(100, debtPct)}%; height: 100%; background: #8b5cf6;"></div>
-          </div>
-        </div>
-
-        <div>
-          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 3px;">
-            <span>🥇 Gold & Precious Metals (Target: 10%)</span>
-            <strong>${goldPct}% (${money(goldVal)})</strong>
-          </div>
-          <div style="height: 5px; background: rgba(0,0,0,0.05); border-radius: 99px; overflow: hidden;">
-            <div style="width: ${Math.min(100, goldPct)}%; height: 100%; background: #f59e0b;"></div>
-          </div>
-        </div>
+          return `
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; margin-bottom: 4px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: ${t.color}; display: inline-block;"></span>
+                  <span style="font-weight: 700; color: #18181b;">${t.name}</span>
+                  <span style="font-size: 10px; color: #71717a; font-family: ui-monospace, monospace;">(Target: ${t.target}%)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  ${driftBadge}
+                  <strong style="font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px; color: #09090b;">${t.actual}% <span style="font-weight: 500; color: #71717a; font-size: 10.5px;">(${money(t.val)})</span></strong>
+                </div>
+              </div>
+              <div style="height: 6px; background: #f4f4f5; border-radius: 3px; overflow: hidden; position: relative;">
+                <div style="width: ${Math.min(100, t.actual)}%; height: 100%; background: ${t.color}; border-radius: 3px;"></div>
+              </div>
+            </div>
+          `;
+        }).join('')}
       </div>
     </div>
   `;
@@ -457,33 +477,40 @@ function renderAssetSuccessionRadar() {
   const coveragePct = totalVal > 0 ? Math.round((protectedVal / totalVal) * 100) : 100;
 
   return `
-    <div style="background: white; border-radius: 14px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <h3 style="margin: 0; font-size: 15px; font-weight: 850;">🏛️ Succession & Nominee Protection</h3>
-          <span style="font-size: 10.5px; font-weight: 750; padding: 3px 8px; border-radius: 99px; background: ${coveragePct >= 80 ? 'rgba(16, 102, 54, 0.08)' : 'rgba(239, 68, 68, 0.08)'}; color: ${coveragePct >= 80 ? '#106636' : '#991b1b'};">
-            ${coveragePct}% Value Protected
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px;">
+          <div>
+            <span style="font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-family: ui-monospace, SFMono-Regular, monospace;">ESTATE SUCCESSION GOVERNANCE</span>
+            <h3 style="margin: 2px 0 0; font-size: 15px; font-weight: 900; color: #09090b; letter-spacing: -0.01em;">Succession & Nominee Protection</h3>
+          </div>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px; background: ${coveragePct >= 80 ? 'rgba(22, 163, 74, 0.08)' : 'rgba(220, 38, 38, 0.08)'}; border: 1px solid ${coveragePct >= 80 ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)'}; color: ${coveragePct >= 80 ? '#15803d' : '#b91c1c'}; font-family: ui-monospace, SFMono-Regular, monospace; white-space: nowrap;">
+            ● ${coveragePct}% VALUE PROTECTED
           </span>
         </div>
-        <p style="margin: 0 0 12px; font-size: 11px; color: #777;">Prevents assets from getting frozen in probate upon succession</p>
+        <p style="margin: 2px 0 16px; font-size: 11.5px; color: #71717a;">Mitigates probate asset freezes and legal succession deadlock across heirs</p>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-        <div style="background: rgba(16, 102, 54, 0.04); padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(16, 102, 54, 0.1);">
-          <span style="font-size: 10.5px; color: #106636; font-weight: 750; display: block;">Protected Wealth</span>
-          <strong style="font-size: 16px; color: #106636;">${money(protectedVal)}</strong>
-          <small style="font-size: 10px; color: #555; display: block;">${protectedAssets.length} assets with legal heir</small>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 6px; overflow: hidden; margin-bottom: 14px;">
+        <div style="padding: 11px 14px; border-right: 1px solid #e4e4e7;">
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #15803d; display: block;">Protected Wealth</span>
+          <strong style="font-size: 15px; font-weight: 900; color: #15803d; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(protectedVal)}</strong>
+          <small style="font-size: 9.5px; color: #71717a; display: block; margin-top: 2px;">${protectedAssets.length} assets with legal heir</small>
         </div>
-        <div style="background: rgba(239, 68, 68, 0.04); padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.1);">
-          <span style="font-size: 10.5px; color: #991b1b; font-weight: 750; display: block;">Probate Risk Pool</span>
-          <strong style="font-size: 16px; color: #991b1b;">${money(unassignedVal)}</strong>
-          <small style="font-size: 10px; color: #777; display: block;">${nonCash.length - protectedAssets.length} unmapped assets</small>
+        <div style="padding: 11px 14px;">
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #b91c1c; display: block;">Probate Risk Pool</span>
+          <strong style="font-size: 15px; font-weight: 900; color: #b91c1c; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(unassignedVal)}</strong>
+          <small style="font-size: 9.5px; color: #71717a; display: block; margin-top: 2px;">${nonCash.length - protectedAssets.length} unmapped assets</small>
         </div>
       </div>
 
-      <div style="background: #f8fafc; padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-        <span style="color: #475569;">${coveragePct >= 80 ? '✓ Estate succession readiness is strong.' : '⚠️ Action recommended: Assign nominees in Digital Will.'}</span>
-        <button type="button" onclick="renderView('willVault')" style="background: #0f172a; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer;">Vault ➔</button>
+      <div style="background: #f4f4f5; border: 1px solid #e4e4e7; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+        <span style="color: #3f3f46; font-size: 10.5px; font-family: ui-monospace, SFMono-Regular, monospace;">
+          ${coveragePct >= 80 ? '✓ Estate readiness meets governance benchmark' : '⚠ Action required: Assign nominees in Digital Will'}
+        </span>
+        <button type="button" onclick="renderView('willVault')" style="background: #09090b; color: #ffffff; border: 1px solid #27272a; padding: 5px 12px; border-radius: 4px; font-size: 10.5px; font-weight: 800; font-family: ui-monospace, SFMono-Regular, monospace; letter-spacing: 0.03em; cursor: pointer; transition: all 0.15s ease;">
+          VAULT ➔
+        </button>
       </div>
     </div>
   `;
@@ -517,36 +544,48 @@ function renderAssetCollateralBorrowingPower() {
   const maxBorrowingCapacity = Math.round(lasEquityCapacity + goldCapacity + lapPropertyCapacity + fdCapacity);
 
   return `
-    <div style="background: white; border-radius: 14px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 10px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
       <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <h3 style="margin: 0; font-size: 15px; font-weight: 850;">🛡️ Collateral & Borrowing Power</h3>
-          <span style="font-size: 10.5px; font-weight: 750; padding: 3px 8px; border-radius: 99px; background: rgba(0,0,0,0.04); color: #111;">No-Sale Liquidity</span>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px;">
+          <div>
+            <span style="font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-family: ui-monospace, SFMono-Regular, monospace;">LIQUIDITY WITHOUT DISPOSAL</span>
+            <h3 style="margin: 2px 0 0; font-size: 15px; font-weight: 900; color: #09090b; letter-spacing: -0.01em;">Collateral & Borrowing Power</h3>
+          </div>
+          <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px; background: #f4f4f5; border: 1px solid #e4e4e7; color: #27272a; font-family: ui-monospace, SFMono-Regular, monospace; white-space: nowrap;">
+            NO-SALE LIQUIDITY
+          </span>
         </div>
-        <p style="margin: 0 0 12px; font-size: 11px; color: #777;">Emergency credit lines unlockable without triggering capital gains taxes</p>
+        <p style="margin: 2px 0 16px; font-size: 11.5px; color: #71717a;">Credit lines accessible against assets without triggering capital gains taxes</p>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px;">
-        <div style="background: rgba(0,0,0,0.015); padding: 8px; border-radius: 8px; text-align: center;">
-          <span style="font-size: 9.5px; color: #777; display: block;">LAS (50% LTV)</span>
-          <strong style="font-size: 12.5px; color: #111;">${money(Math.round(lasEquityCapacity))}</strong>
+      <!-- 3-Segment Grid -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; background: #fafafa; border: 1px solid #e4e4e7; border-radius: 6px; overflow: hidden; margin-bottom: 14px;">
+        <div style="padding: 11px 12px; border-right: 1px solid #e4e4e7;">
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">LAS (50% LTV)</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(Math.round(lasEquityCapacity))}</strong>
+          <small style="font-size: 9.5px; color: #a1a1aa; display: block; margin-top: 2px;">Against shares</small>
         </div>
-        <div style="background: rgba(0,0,0,0.015); padding: 8px; border-radius: 8px; text-align: center;">
-          <span style="font-size: 9.5px; color: #777; display: block;">Gold (75% LTV)</span>
-          <strong style="font-size: 12.5px; color: #111;">${money(Math.round(goldCapacity))}</strong>
+        <div style="padding: 11px 12px; border-right: 1px solid #e4e4e7;">
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">Gold (75% LTV)</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(Math.round(goldCapacity))}</strong>
+          <small style="font-size: 9.5px; color: #a1a1aa; display: block; margin-top: 2px;">Against bullion</small>
         </div>
-        <div style="background: rgba(0,0,0,0.015); padding: 8px; border-radius: 8px; text-align: center;">
-          <span style="font-size: 9.5px; color: #777; display: block;">LAP (60% LTV)</span>
-          <strong style="font-size: 12.5px; color: #111;">${money(Math.round(lapPropertyCapacity))}</strong>
+        <div style="padding: 11px 12px;">
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; display: block;">LAP (60% LTV)</span>
+          <strong style="font-size: 13.5px; font-weight: 800; color: #09090b; font-family: ui-monospace, SFMono-Regular, monospace; display: block; margin-top: 1px;">${money(Math.round(lapPropertyCapacity))}</strong>
+          <small style="font-size: 9.5px; color: #a1a1aa; display: block; margin-top: 2px;">Against property</small>
         </div>
       </div>
 
-      <div style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%); padding: 10px 14px; border-radius: 10px; color: white; display: flex; justify-content: space-between; align-items: center;">
+      <div style="background: #09090b; border: 1px solid #27272a; padding: 12px 16px; border-radius: 6px; color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <span style="font-size: 10.5px; color: #9ca3af; display: block;">Total Unencumbered Borrowing Power</span>
-          <strong style="font-size: 16px; color: white;">${money(maxBorrowingCapacity)}</strong>
+          <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #a1a1aa; display: block;">Unencumbered Borrowing Power</span>
+          <strong style="font-size: 16px; font-weight: 900; color: #ffffff; font-family: ui-monospace, SFMono-Regular, monospace; letter-spacing: -0.01em;">${money(maxBorrowingCapacity)}</strong>
+          <small style="font-size: 9.5px; color: #71717a; display: block; margin-top: 2px;">Instant credit potential across unpledged portfolio</small>
         </div>
-        <span style="font-size: 18px;">⚡</span>
+        <div style="background: #18181b; border: 1px solid #27272a; padding: 5px 10px; border-radius: 4px; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 10px; font-weight: 800; color: #38bdf8; letter-spacing: 0.04em;">
+          LIQUIDITY LTV
+        </div>
       </div>
     </div>
   `;
@@ -564,16 +603,18 @@ function assetPortfolioSummary() {
   let activeLoansCount = 0;
 
   nonCash.forEach(asset => {
-    if (isTruthy(asset.hasLoan) && Number(asset.loanAmount || 0) > 0) {
+    if (isAssetFinanced(asset)) {
       const snap = financedAssetSnapshot(asset);
-      totalOutstandingDebt += snap.outstandingLoan;
-      activeLoansCount++;
+      if (snap.outstandingLoan > 0) {
+        totalOutstandingDebt += snap.outstandingLoan;
+        activeLoansCount++;
+      }
     }
   });
 
   (state.liabilities || []).forEach(lib => {
     const isLoan = /loan|mortgage|emi/i.test(lib.type || lib.name || '');
-    if (isLoan && !nonCash.some(a => isTruthy(a.hasLoan) && (a.name === lib.name || a.id === lib.linkedAssetId))) {
+    if (isLoan && !nonCash.some(a => isAssetFinanced(a) && (a.name === lib.name || a.id === lib.linkedAssetId))) {
       const val = Number(lib.value || lib.balance || lib.amount || 0);
       if (val > 0) {
         totalOutstandingDebt += val;
@@ -664,12 +705,12 @@ function assetCockpitSpotlight() {
       copy: `${missingAsset.name} needs ${missing}. Fixing proof first makes resale, claims, and family handover easier.`
     };
   }
-  const loanAsset = nonCashAssets().find(asset => isVehicleAsset(asset) && isTruthy(asset.hasLoan));
+  const loanAsset = nonCashAssets().find(asset => isAssetFinanced(asset));
   if (loanAsset) {
     const snapshot = financedAssetSnapshot(loanAsset);
     return {
-      title: "Vehicle equity tracked",
-      copy: `${loanAsset.name} currently contributes ${money(snapshot.netWorthContribution)} after subtracting the outstanding loan.`
+      title: `${loanAsset.type || 'Asset'} equity tracked`,
+      copy: `${loanAsset.name} currently contributes ${money(snapshot.netWorthContribution)} after subtracting ${money(snapshot.outstandingLoan)} outstanding loan debt.`
     };
   }
   const staleAsset = state.assets.find(isAssetValueOutdated);
@@ -1239,6 +1280,7 @@ function assetSmartSignal(asset) {
 }
 
 function renderAssetCategory(categoryKey) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const category = assetCategoryViews[categoryKey];
   const items = filteredSortedAssets().filter(asset => assetCategoryForAsset(asset) === categoryKey);
   if (categoryKey === "investments") {
@@ -1263,9 +1305,11 @@ function renderAssetCategory(categoryKey) {
     ${sectionHeader(`Your ${category.title.toLowerCase()}`, items.length ? "Click to see specifications" : category.emptyText)}
     ${items.length ? categoryCards(items, category) : categoryEmptyState(category)}
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function renderInvestmentCategory(category, items) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const filteredItems = filterInvestmentHoldings(items, investmentFilters);
   const sortedItems = sortedInvestmentHoldings(filteredItems, investmentSort);
   const summary = investmentPortfolioSummary(items);
@@ -1302,6 +1346,7 @@ function renderInvestmentCategory(category, items) {
     ${sortedItems.length ? `${sectionHeader("Holdings Table", "Sortable spreadsheet-style view")}${investmentHoldingsTable(sortedItems, summary.currentValue)}` : ""}
     ${items.length ? `${sectionHeader("P/L Statement", "Realized, unrealized and dividend return")}${investmentPlStatement(items, summary)}` : ""}
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function investmentSignalDeck(items, summary) {
@@ -2224,6 +2269,7 @@ function categoryCard(item, category) {
 }
 
 function renderAssetDetail(assetId) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const asset = state.assets.find(item => item.id === assetId);
   if (!asset) {
     renderView("assets");
@@ -2316,6 +2362,7 @@ function renderAssetDetail(assetId) {
   `;
   syncTabs("assets");
   refreshMetrics();
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function vehicleAppraisalWorkflow(asset) {
@@ -2434,6 +2481,7 @@ function vehicleAppraisalWorkflow(asset) {
 
     </section>
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function parseVehicleValuationJson(value) {

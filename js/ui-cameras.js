@@ -222,8 +222,8 @@ function getSecurityDashboardBanner() {
         </button>
       </div>
       ${latestEvent ? `
-        <div style="font-size: 12.5px; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
-          <span>Latest Telemetry: <b style="color: #fff;">${escapeHtml(latestEvent.type)}</b> at ${escapeHtml(latestEvent.cameraName)} (${escapeHtml(latestEvent.location)})</span>
+        <div style="font-size: 12.5px; color: #fff; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+          <span style="color: #fff;">Latest Telemetry: <b style="color: #fff;">${escapeHtml(latestEvent.type)}</b> at ${escapeHtml(latestEvent.cameraName)} (${escapeHtml(latestEvent.location)})</span>
           <span style="font-size: 11.5px; font-family: monospace; color: #94a3b8;">${new Date(latestEvent.timestamp).toLocaleTimeString('en-IN')}</span>
         </div>
       ` : ''}
@@ -234,6 +234,7 @@ function getSecurityDashboardBanner() {
 // ── Main Render Routine ──────────────────────────────────────
 
 function renderCameras() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   stopAllCanvasLoops();
 
   const locations = getCameraLocations();
@@ -430,6 +431,7 @@ function renderCameras() {
     initSimulatedCctvCanvases();
     attachWebcamStreams();
   }, 50);
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function stopAllCanvasLoops() {
@@ -438,6 +440,7 @@ function stopAllCanvasLoops() {
 }
 
 window.switchCameraLayout = (mode) => {
+  if (typeof scrollToTop === 'function') scrollToTop();
   cameraLayoutMode = mode;
   if (patrolIntervalId) {
     clearInterval(patrolIntervalId);

@@ -378,6 +378,7 @@ function calculateVaultMetrics() {
 // ── Main Page Render ──────────────────────────────────────
 
 function renderDocumentVaultPage() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const metrics = calculateVaultMetrics();
   const allDocs = state.documents || [];
 
@@ -473,6 +474,7 @@ function renderDocumentVaultPage() {
 
     ${renderDocModals(metrics)}
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 // ── Top KPI Strip ─────────────────────────────────────────
@@ -569,6 +571,7 @@ function renderDocDropzone() {
 // ── Category Content with Suggested Checklist Cards ───────
 
 function toggleSuggestedDocsExpand() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   docSuggestedExpanded = !docSuggestedExpanded;
   renderDocumentVaultPage();
 }
@@ -1156,11 +1159,13 @@ function renderDocModals(metrics) {
 // ── Handlers & Actions ────────────────────────────────────
 
 function switchDocCategory(catKey) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   docActiveCategory = catKey;
   renderDocumentVaultPage();
 }
 
 function handleDocOwnerChange(event) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   docActiveOwner = event.target.value;
   renderDocumentVaultPage();
 }
@@ -1171,6 +1176,7 @@ function handleDocSearch(event) {
 }
 
 function switchDocViewMode(mode) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   docViewMode = mode;
   renderDocumentVaultPage();
 }

@@ -1,4 +1,5 @@
 function renderTaxDocuments() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   actions.innerHTML = `
     <button class="primary-action" type="button" data-add="documents" data-prefill-linked="Tax Filing" data-prefill-required="Tax Documents">Upload Tax Document</button>
   `;
@@ -85,7 +86,7 @@ function renderTaxDocuments() {
         });
       });
     }, 0);
-
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function calculate5HeadsBreakdown() {
@@ -3930,6 +3931,9 @@ async function saveRecord(event) {
     values.odometer = nonNegativeNumber(values.odometer);
     values.mileageKm = nonNegativeNumber(values.mileageKm || values.odometer);
     values.ownerCount = nonNegativeNumber(values.ownerCount);
+    if (values.loanAmount > 0 && (!isTruthy(values.hasLoan) || String(values.hasLoan || "").toLowerCase().startsWith("no"))) {
+      values.hasLoan = isVehicleAsset({ ...existing, ...values }) ? "Yes (Active Loan)" : "Yes (Active Home Loan)";
+    }
     if (isVehicleAsset({ ...existing, ...values }) && values.purchasePrice > 0 && (!values.value || !values.valuationBasis)) {
       const vehicleEstimate = estimateAssetValue(values);
       if (vehicleEstimate) {
@@ -4636,6 +4640,7 @@ document.querySelector("#logout-button").addEventListener("click", async () => {
     // The local session still gets cleared if the server has already forgotten it.
   }
   localStorage.removeItem(tokenKey);
+  localStorage.removeItem(refreshTokenKey);
   activeUser = null;
   state = emptyState();
   showAuth();

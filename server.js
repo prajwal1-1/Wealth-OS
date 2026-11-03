@@ -25,10 +25,10 @@ const QRCode = require('qrcode');
 const app = express();
 const upload = multer({ dest: path.join(__dirname, 'tmp', 'uploads') });
 const PORT = process.env.PORT || 3001;
-const appDataDir = path.join(__dirname, 'tmp', 'wealth-os');
+const appDataDir = path.join(__dirname, 'storage', 'wealth-os');
 const wealthDbPath = path.join(appDataDir, 'wealth-os-db.json');
 const wealthDbKeyPath = path.join(appDataDir, 'wealth-os-db.key');
-const wealthFilesDir = path.join(appDataDir, 'files');
+const wealthFilesDir = path.join(__dirname, 'storage', 'files');
 const sessionMaxAgeMs = 1000 * 60 * 60 * 24 * 14;
 let financeNewsCache = { fetchedAt: 0, items: [] };
 let financeNewsRefreshIndex = 0;
@@ -387,7 +387,7 @@ const cleanWealthData = data => ({
     serialNumber: shortText(item.serialNumber, 80),
     area: shortText(item.area, 80),
     condition: shortText(item.condition, 40),
-    hasLoan: shortText(item.hasLoan, 20),
+    hasLoan: shortText(item.hasLoan, 60) || (cleanNumber(item.loanAmount) > 0 ? 'Yes (Active Loan)' : ''),
     loanAmount: cleanNumber(item.loanAmount),
     downPayment: cleanNumber(item.downPayment),
     interestRate: cleanNumber(item.interestRate),
@@ -1834,6 +1834,24 @@ app.get('/api/wealth/files/:id', (req, res) => {
       const assetPhoto = rawDb.prepare('SELECT user_id FROM assets WHERE photo_id = ?').get(id);
       if (assetPhoto) {
         authorizedUserId = assetPhoto.user_id;
+      }
+    }
+
+    // 5. Fallback for registered documents
+    if (!authorizedUserId) {
+      const rawDb = getDb();
+      const docRecord = rawDb.prepare('SELECT user_id FROM documents WHERE file_id = ?').get(id);
+      if (docRecord) {
+        authorizedUserId = docRecord.user_id;
+      }
+    }
+
+    // 6. Fallback for vault files directly
+    if (!authorizedUserId) {
+      const rawDb = getDb();
+      const vaultRecord = rawDb.prepare('SELECT user_id FROM vault_files WHERE id = ?').get(id);
+      if (vaultRecord) {
+        authorizedUserId = vaultRecord.user_id;
       }
     }
 

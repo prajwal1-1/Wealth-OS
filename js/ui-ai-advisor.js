@@ -144,6 +144,7 @@ function computeComprehensiveHealthScorecard() {
 // ── Main Render Routine ──────────────────────────────────────
 
 function renderAi() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   if (advisorChatMessages.length === 0) {
     const p = advisorPersonas[advisorActivePersona];
     advisorChatMessages.push({
@@ -156,6 +157,74 @@ function renderAi() {
   const currentPersona = advisorPersonas[advisorActivePersona];
   const data = totals();
   const scorecard = computeComprehensiveHealthScorecard();
+
+  const llmEngine = window.wealthLLMEngine;
+  const isLlmReady = llmEngine && llmEngine.isReady;
+  const isLlmLoading = llmEngine && llmEngine.isLoading;
+  const currentModelId = llmEngine ? llmEngine.currentModel : "Llama-3.2-1B-Instruct-q4f32_1-MLC";
+  const modelsList = window.WEALTH_MODELS || [];
+
+  // Offline AI Engine Control Bar
+  const offlineAiControlHtml = `
+    <div style="background: #0f172a; border: 1.5px solid #334155; border-radius: 10px; padding: 12px 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-sizing: border-box; width: 100%;">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <span style="font-size: 11px; font-weight: 850; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; ${isLlmReady ? 'background: #065f46; color: #34d399; border: 1px solid #059669;' : isLlmLoading ? 'background: #78350f; color: #fbbf24; border: 1px solid #d97706;' : 'background: #1e293b; color: #94a3b8; border: 1px solid #475569;'}">
+          ${isLlmReady ? '⚡ 100% Offline AI Active (WebGPU)' : isLlmLoading ? '⏳ Loading Local Model...' : '⚙️ Rule-Based Engine (Standby)'}
+        </span>
+        <span id="ai-engine-status-text" style="font-size: 12px; color: #cbd5e1; font-weight: 600;">
+          ${llmEngine ? llmEngine.loadStatusText : 'Offline WebLLM Ready'}
+        </span>
+        <span style="font-size: 11px; color: #64748b; font-weight: 700; background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px;">
+          💾 Cached: ${llmEngine ? llmEngine.getFormattedStorageUsage() : '0 MB'}
+        </span>
+        ${isLlmReady && llmEngine.tokensPerSec ? `
+          <span style="font-size: 11px; color: #38bdf8; font-weight: 800; background: rgba(56,189,248,0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.2);">
+            ⚡ ${llmEngine.tokensPerSec} tokens/sec
+          </span>
+        ` : ''}
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Creativity:</label>
+          <select onchange="if(window.wealthLLMEngine) window.wealthLLMEngine.setTemperature(this.value)" style="background: #1e293b; color: #ffffff; border: 1px solid #475569; border-radius: 6px; padding: 5px 8px; font-size: 11.5px; font-weight: 700; outline: none; cursor: pointer;">
+            <option value="0.2" ${llmEngine && llmEngine.temperature === 0.2 ? 'selected' : ''}>Strict (0.2)</option>
+            <option value="0.4" ${!llmEngine || llmEngine.temperature === 0.4 ? 'selected' : ''}>Balanced (0.4)</option>
+            <option value="0.7" ${llmEngine && llmEngine.temperature === 0.7 ? 'selected' : ''}>Strategic (0.7)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Model:</label>
+          <select onchange="window.switchOfflineAiModel(this.value)" style="background: #1e293b; color: #ffffff; border: 1px solid #475569; border-radius: 6px; padding: 5px 8px; font-size: 11.5px; font-weight: 700; outline: none; cursor: pointer;">
+            ${modelsList.map(m => `
+              <option value="${m.id}" ${m.id === currentModelId ? 'selected' : ''}>
+                ${m.name} (${m.size})
+              </option>
+            `).join('')}
+          </select>
+        </div>
+
+        ${!isLlmReady && !isLlmLoading ? `
+          <button id="ai-load-model-btn" onclick="window.initOfflineAiModel()" style="background: #2563eb; color: #ffffff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.15s;">
+            Initialize Local AI
+          </button>
+        ` : ''}
+
+        ${isLlmReady ? `
+          <button onclick="window.purgeOfflineAiCache()" title="Clear offline model cache from browser IndexedDB" style="background: transparent; color: #ef4444; border: 1px solid #7f1d1d; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
+            Purge Cache
+          </button>
+        ` : ''}
+      </div>
+
+      ${isLlmLoading ? `
+        <div style="width: 100%; background: #1e293b; border-radius: 99px; height: 6px; overflow: hidden; margin-top: 4px;">
+          <div id="ai-engine-progress-bar" style="background: #10b981; height: 100%; width: ${llmEngine.loadProgress}%; transition: width 0.2s ease;"></div>
+        </div>
+      ` : ''}
+    </div>
+  `;
 
   // High-Contrast Header Banner
   const headerHtml = `
@@ -224,13 +293,14 @@ function renderAi() {
   if (appActions) appActions.innerHTML = "";
   if (moduleGrid) moduleGrid.innerHTML = "";
   if (appList) {
-    appList.innerHTML = `<section class="ai-advisor-container" style="padding-bottom: 60px; box-sizing: border-box; width: 100%; max-width: 100%;">${headerHtml}${subNavHtml}${subViewContent}</section>`;
+    appList.innerHTML = `<section class="ai-advisor-container" style="padding-bottom: 60px; box-sizing: border-box; width: 100%; max-width: 100%;">${headerHtml}${offlineAiControlHtml}${subNavHtml}${subViewContent}</section>`;
   }
 
   setTimeout(() => {
     const thread = document.getElementById("ai-chat-thread");
     if (thread) thread.scrollTop = thread.scrollHeight;
   }, 30);
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 window.renderAi = renderAi;
@@ -565,9 +635,17 @@ window.toggleVoiceNarration = () => {
   const lastAiMsg = [...advisorChatMessages].reverse().find(m => m.sender === 'ai');
   if (!lastAiMsg || !window.speechSynthesis) return;
 
-  const plainText = lastAiMsg.text.replace(/#/g, '').replace(/\*/g, '').replace(/\|/g, '').replace(/<[^>]*>/g, '');
+  const plainText = lastAiMsg.text
+    .replace(/```[\s\S]*?```/g, '') // remove code blocks
+    .replace(/\[\s*\]|\[\s*✓\s*\]/g, '') // remove checkbox brackets
+    .replace(/[#*`_>|]/g, ' ') // remove markdown syntax
+    .replace(/₹/g, 'Rupees ') // speak Rupees
+    .replace(/<[^>]*>/g, '') // strip HTML
+    .replace(/\s+/g, ' ') // collapse spaces
+    .trim();
+
   const utterance = new SpeechSynthesisUtterance(plainText);
-  utterance.rate = 1.0;
+  utterance.rate = 1.05;
   utterance.pitch = 1.0;
 
   utterance.onend = () => {
@@ -618,7 +696,7 @@ function submitAiAdvisorQuestion(e) {
 // INTELLIGENT REASONING ENGINE & CONTEXT-AWARE GENERATOR
 // ═══════════════════════════════════════════════════════════
 
-function executeAiQuestion(question) {
+async function executeAiQuestion(question) {
   advisorChatMessages.push({
     sender: "user",
     text: question
@@ -627,6 +705,46 @@ function executeAiQuestion(question) {
   advisorIsGenerating = true;
   renderAi();
 
+  // If WebLLM is active and ready, stream real-time tokens directly
+  if (window.wealthLLMEngine && window.wealthLLMEngine.isReady) {
+    const aiMsgIndex = advisorChatMessages.length;
+    advisorChatMessages.push({
+      sender: "ai",
+      persona: advisorActivePersona,
+      text: "..."
+    });
+
+    try {
+      await window.wealthLLMEngine.generateResponse(
+        question,
+        advisorActivePersona,
+        advisorChatMessages.slice(0, -1),
+        (delta, fullText) => {
+          advisorChatMessages[aiMsgIndex].text = fullText;
+          const thread = document.getElementById("ai-chat-thread");
+          if (thread) {
+            const bubbles = thread.querySelectorAll(".chat-message-bubble");
+            if (bubbles.length > 0) {
+              const lastBubble = bubbles[bubbles.length - 1];
+              if (lastBubble) {
+                lastBubble.innerHTML = formatMarkdownContent(fullText) + '<span class="streaming-cursor">▌</span>';
+              }
+            }
+            thread.scrollTop = thread.scrollHeight;
+          }
+        }
+      );
+      advisorIsGenerating = false;
+      renderAi();
+      return;
+    } catch (err) {
+      console.warn("[WebLLM] Streaming inference error, falling back to rule engine:", err);
+      // Fallback
+      advisorChatMessages.pop();
+    }
+  }
+
+  // Fallback to instant rule-based knowledge engine
   setTimeout(() => {
     const responseText = generateIntelligentAiAnswer(question, advisorActivePersona);
     advisorChatMessages.push({
@@ -636,7 +754,7 @@ function executeAiQuestion(question) {
     });
     advisorIsGenerating = false;
     renderAi();
-  }, 300);
+  }, 250);
 }
 
 function generateIntelligentAiAnswer(question, persona) {
@@ -937,6 +1055,7 @@ function renderChatMessage(msg) {
 
   const p = advisorPersonas[msg.persona || advisorActivePersona] || advisorPersonas.cwo;
   const renderedText = formatMarkdownContent(msg.text);
+  const actionChipsHtml = extractActionChips(msg.text);
 
   return `
     <div style="display: flex; gap: 8px; align-items: flex-start; margin-bottom: 6px; box-sizing: border-box; width: 100%;">
@@ -948,19 +1067,43 @@ function renderChatMessage(msg) {
           <span style="font-size: 11px; font-weight: 850; color: ${p.accent}; text-transform: uppercase; letter-spacing: 0.5px;">${p.name}</span>
           <span style="font-size: 10.5px; color: #64748b; font-weight: 600;">${new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
-        <div style="color: #0f172a;">${renderedText}</div>
+        <div class="chat-message-bubble" style="color: #0f172a;">${renderedText}</div>
+        ${actionChipsHtml}
       </div>
     </div>
   `;
 }
 
+function extractActionChips(text) {
+  if (!text) return "";
+  const lower = text.toLowerCase();
+  const chips = [];
+  if (lower.includes("tax") || lower.includes("80c") || lower.includes("80d") || lower.includes("80ccd") || lower.includes("regime")) {
+    chips.push(`<button onclick="renderView('taxDocuments')" style="background:#0f172a; color:#fff; border:none; padding:5px 11px; border-radius:6px; font-size:11px; font-weight:750; cursor:pointer; transition:all 0.15s;" onmouseenter="this.style.background='#2563eb'" onmouseleave="this.style.background='#0f172a'">🎯 Open Tax Profile &rarr;</button>`);
+  }
+  if (lower.includes("will") || lower.includes("nominee") || lower.includes("succession") || lower.includes("heir")) {
+    chips.push(`<button onclick="renderView('willVault')" style="background:#0f172a; color:#fff; border:none; padding:5px 11px; border-radius:6px; font-size:11px; font-weight:750; cursor:pointer; transition:all 0.15s;" onmouseenter="this.style.background='#d97706'" onmouseleave="this.style.background='#0f172a'">📜 Open Will Vault &rarr;</button>`);
+  }
+  if (lower.includes("fire") || lower.includes("retirement") || lower.includes("compounding") || lower.includes("surplus") || lower.includes("sip")) {
+    chips.push(`<button onclick="renderView('reports')" style="background:#0f172a; color:#fff; border:none; padding:5px 11px; border-radius:6px; font-size:11px; font-weight:750; cursor:pointer; transition:all 0.15s;" onmouseenter="this.style.background='#059669'" onmouseleave="this.style.background='#0f172a'">📊 Open Reports & Compounding &rarr;</button>`);
+  }
+  if (lower.includes("debt") || lower.includes("loan") || lower.includes("emi") || lower.includes("asset")) {
+    chips.push(`<button onclick="renderView('assets')" style="background:#0f172a; color:#fff; border:none; padding:5px 11px; border-radius:6px; font-size:11px; font-weight:750; cursor:pointer; transition:all 0.15s;" onmouseenter="this.style.background='#0284c7'" onmouseleave="this.style.background='#0f172a'">💼 Open Assets & Liabilities &rarr;</button>`);
+  }
+  if (chips.length === 0) return "";
+  return `<div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; padding-top:10px; border-top:1px dashed #cbd5e1;"><span style="font-size:10.5px; font-weight:800; color:#64748b; align-self:center; text-transform:uppercase; letter-spacing:0.5px;">Directives:</span>${chips.join('')}</div>`;
+}
+
 function formatMarkdownContent(text) {
   if (!text) return "";
   let html = text
-    .replace(/^### (.*$)/gim, '<h4 style="margin: 6px 0 4px; font-size: 14px; font-weight: 850; color: #0f172a;">$1</h4>')
-    .replace(/^## (.*$)/gim, '<h3 style="margin: 8px 0 4px; font-size: 15px; font-weight: 850; color: #0f172a;">$1</h3>')
+    .replace(/^### (.*$)/gim, '<h4 style="margin: 8px 0 4px; font-size: 14px; font-weight: 850; color: #0f172a;">$1</h4>')
+    .replace(/^## (.*$)/gim, '<h3 style="margin: 10px 0 4px; font-size: 15px; font-weight: 850; color: #0f172a;">$1</h3>')
     .replace(/\*\*(.*?)\*\*/g, '<b style="color:#0f172a; font-weight:800;">$1</b>')
     .replace(/\*(.*?)\*/g, '<i style="color:#1e293b;">$1</i>')
+    .replace(/^- \[ \] (.*$)/gim, '<div style="margin: 3px 0; color:#334155;"><span style="color:#64748b; font-family:monospace; font-weight:bold;">[ ]</span> $1</div>')
+    .replace(/^- \[x\] (.*$)/gim, '<div style="margin: 3px 0; color:#0f172a; font-weight:700;"><span style="color:#16a34a; font-family:monospace; font-weight:800;">[✓]</span> $1</div>')
+    .replace(/^> (.*$)/gim, '<div style="border-left: 3.5px solid #0284c7; padding: 6px 12px; background: #f0f9ff; color: #0369a1; border-radius: 4px; margin: 6px 0; font-weight:600; font-size:12.5px;">$1</div>')
     .replace(/\`([^\`]+)\`/g, '<code style="background: #e2e8f0; color: #0f172a; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; font-weight: 700;">$1</code>');
 
   if (html.includes('|')) {
@@ -1011,46 +1154,141 @@ window.printAiAdvisoryDossierPdf = () => {
 
   const data = totals();
   const userName = (window.activeUser && window.activeUser.name) || 'Executive Account Holder';
+  const engineModel = (window.wealthLLMEngine && window.wealthLLMEngine.isReady) ? window.wealthLLMEngine.currentModel : "Deterministic Wealth Reasoning Engine";
 
   const html = `
     <!DOCTYPE html>
     <html>
       <head>
-        <title>AI Wealth Advisory Audit Dossier — ${escapeHtml(userName)}</title>
+        <title>AI Wealth Advisory Dossier - ${escapeHtml(userName)}</title>
         <style>
-          @page { size: A4; margin: 20mm; }
-          body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; line-height: 1.5; color: #0f172a; max-width: 800px; margin: 0 auto; padding: 10px; }
-          h1 { font-size: 17pt; text-transform: uppercase; border-bottom: 2px solid #0f172a; padding-bottom: 6px; }
-          .chat-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; font-size: 9.5pt; color: #0f172a; }
-          .persona-badge { font-weight: bold; font-size: 8.5pt; color: #0284c7; text-transform: uppercase; }
+          @page { size: A4; margin: 16mm; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10pt; line-height: 1.5; color: #0f172a; max-width: 800px; margin: 0 auto; padding: 12px; }
+          .header { border-bottom: 2.5px solid #0f172a; padding-bottom: 12px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: flex-end; }
+          .title { font-size: 18pt; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; margin: 0; color: #0f172a; }
+          .subtitle { font-size: 9pt; color: #64748b; font-weight: 600; margin-top: 2px; }
+          .meta-pill { font-size: 8.5pt; font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; }
+          .snapshot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+          .snapshot-card { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 10px; }
+          .snapshot-label { font-size: 8pt; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
+          .snapshot-value { font-size: 13pt; font-weight: 900; color: #0f172a; }
+          .chat-box { background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; font-size: 9.5pt; color: #0f172a; page-break-inside: avoid; }
+          .persona-badge { font-weight: 900; font-size: 8.5pt; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+          .disclaimer { border-top: 1px solid #cbd5e1; padding-top: 10px; margin-top: 30px; font-size: 7.5pt; color: #64748b; line-height: 1.4; }
+          .signature-row { margin-top: 35px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+          .signature-line { border-top: 1.5px solid #0f172a; width: 220px; text-align: center; padding-top: 6px; font-size: 9pt; font-weight: 700; color: #0f172a; }
+          table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 9pt; }
+          th { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 8px; text-align: left; font-weight: 800; }
+          td { border: 1px solid #cbd5e1; padding: 5px 8px; }
         </style>
       </head>
       <body>
-        <h1>SOVEREIGN AI FINANCIAL ADVISORY DOSSIER</h1>
-        <p style="color: #64748b;">Prepared for <b>${escapeHtml(userName)}</b> &bull; Date: ${new Date().toLocaleDateString('en-IN')}</p>
-
-        <div style="background: #f1f5f9; padding: 8px 12px; border-radius: 6px; margin-bottom: 16px; font-size: 9.5pt;">
-          <b>Standing:</b> Net Worth: ${money(data.netWorth)} | Cashflow Surplus: ${money(data.cashFlow)}/mo | Debt Load: ${data.debtRatio}%
+        <div class="header">
+          <div>
+            <h1 class="title">WEALTH OS AI ADVISORY DOSSIER</h1>
+            <div class="subtitle">Zero-Knowledge Sovereign Balance Sheet & Capital Deployment Record</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="meta-pill">SYS: WOS-AI-900 &bull; ${new Date().toLocaleDateString('en-IN')}</div>
+            <div style="font-size: 8pt; color: #64748b; margin-top: 3px;">Engine: ${escapeHtml(engineModel)}</div>
+          </div>
         </div>
 
-        <h3>Advisory Consultation Record</h3>
+        <div style="font-size: 9.5pt; margin-bottom: 14px; color: #334155;">
+          <b>Account Holder:</b> ${escapeHtml(userName)} &bull; <b>Reporting Date:</b> ${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </div>
+
+        <div class="snapshot-grid">
+          <div class="snapshot-card">
+            <div class="snapshot-label">Consolidated Net Worth</div>
+            <div class="snapshot-value">${money(data.netWorth)}</div>
+          </div>
+          <div class="snapshot-card">
+            <div class="snapshot-label">Total Assets Base</div>
+            <div class="snapshot-value">${money(data.assets + data.cash)}</div>
+          </div>
+          <div class="snapshot-card">
+            <div class="snapshot-label">Monthly Cashflow Surplus</div>
+            <div class="snapshot-value" style="color: #059669;">${money(data.cashFlow)}/mo</div>
+          </div>
+          <div class="snapshot-card">
+            <div class="snapshot-label">Debt-To-Asset Ratio</div>
+            <div class="snapshot-value">${data.debtRatio}%</div>
+          </div>
+        </div>
+
+        <h3 style="font-size: 11pt; font-weight: 900; text-transform: uppercase; color: #0f172a; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">
+          Executive Advisory Consultation Record
+        </h3>
+
         ${advisorChatMessages.map(msg => `
-          <div class="chat-box">
-            <div class="persona-badge">${msg.sender === 'user' ? 'CLIENT INQUIRY' : 'ADVISOR DIRECTIVE (' + (advisorPersonas[msg.persona]?.name || 'CWO') + ')'}</div>
-            <div style="margin-top: 4px;">${formatMarkdownContent(msg.text)}</div>
+          <div class="chat-box" style="border-left: 4px solid ${msg.sender === 'user' ? '#0f172a' : (advisorPersonas[msg.persona]?.accent || '#0284c7')};">
+            <div class="persona-badge" style="color: ${msg.sender === 'user' ? '#0f172a' : (advisorPersonas[msg.persona]?.accent || '#0284c7')};">
+              ${msg.sender === 'user' ? 'CLIENT INQUIRY' : 'ADVISORY DIRECTIVE: ' + (advisorPersonas[msg.persona]?.name || 'CHIEF WEALTH OFFICER')}
+            </div>
+            <div>${formatMarkdownContent(msg.text)}</div>
           </div>
         `).join('')}
 
-        <div style="margin-top: 40px; display: flex; justify-content: space-between;">
-          <div style="border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 6px; font-size: 9pt;">Advisory Officer</div>
-          <div style="border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 6px; font-size: 9pt;">Account Holder</div>
+        <div class="signature-row">
+          <div class="signature-line">
+            Autonomous Advisory Officer<br>
+            <span style="font-size: 7.5pt; color: #64748b; font-weight: normal;">Wealth OS AI Financial Intelligence Unit</span>
+          </div>
+          <div class="signature-line">
+            ${escapeHtml(userName)}<br>
+            <span style="font-size: 7.5pt; color: #64748b; font-weight: normal;">Account Holder / Authorized Signatory</span>
+          </div>
         </div>
+
+        <div class="disclaimer">
+          <b>CONFIDENTIAL & SOVEREIGN:</b> This advisory audit record was compiled 100% locally via client-side on-device execution. No private financial data, portfolio figures, or tax computations were transmitted to external cloud servers. Intended solely for analytical, strategic balance-sheet modeling and decision-support.
+        </div>
+
         <script>window.print();</script>
       </body>
     </html>
   `;
   printWindow.document.write(html);
   printWindow.document.close();
+};
+
+// WebLLM Engine Event Listeners & Global Helpers
+if (window.wealthLLMEngine) {
+  window.wealthLLMEngine.onProgress((st) => {
+    const bar = document.getElementById("ai-engine-progress-bar");
+    const txt = document.getElementById("ai-engine-status-text");
+    if (bar) bar.style.width = (st.progress || 0) + "%";
+    if (txt) txt.textContent = (st.text || "") + (st.progress > 0 && st.progress < 100 ? " (" + st.progress + "%)" : "");
+    if (st.isReady && typeof activeView !== 'undefined' && activeView === 'ai') {
+      renderAi();
+    }
+  });
+}
+
+window.initOfflineAiModel = async (modelId) => {
+  if (!window.wealthLLMEngine) return;
+  const btn = document.getElementById("ai-load-model-btn");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Loading...";
+  }
+  await window.wealthLLMEngine.initialize(modelId || window.wealthLLMEngine.currentModel);
+  renderAi();
+};
+
+window.switchOfflineAiModel = async (modelId) => {
+  if (!window.wealthLLMEngine) return;
+  await window.wealthLLMEngine.initialize(modelId);
+  renderAi();
+};
+
+window.purgeOfflineAiCache = async () => {
+  if (!window.wealthLLMEngine) return;
+  if (confirm("Are you sure you want to purge the offline model weights from your browser's local cache?")) {
+    await window.wealthLLMEngine.purgeLocalCache();
+    renderAi();
+  }
 };
 
 // Immediate auto-render if the user is already on the AI view
