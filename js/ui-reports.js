@@ -51,6 +51,7 @@ let stressInflationPercent = 8;
 // ── Main Render Routine ──────────────────────────────────────
 
 function renderReports() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const data = totals();
   const assets = state.assets || [];
   const liabilities = state.liabilities || [];
@@ -156,9 +157,11 @@ function renderReports() {
   list.innerHTML = `<section class="reports-hub-container" style="padding-bottom: 60px;">${headerHtml}${topMetricsHtml}${navTabsHtml}${tabContent}</section>`;
   actions.innerHTML = "";
   grid.innerHTML = "";
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 window.switchReportsTab = (tab) => {
+  if (typeof scrollToTop === 'function') scrollToTop();
   currentReportsTab = tab;
   renderReports();
 };

@@ -56,8 +56,10 @@ async function fetchCashflowData() {
 }
 
 async function selectCashflowMonth(monthKey) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   cashflowFilters.selectedMonth = monthKey;
   await renderCashflowPage();
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function renderAiExecutiveSummary(analytics) {
@@ -369,6 +371,7 @@ function renderTemporalHeatmapWidget(analytics) {
 }
 
 async function renderCashflowPage() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   try {
     list.innerHTML = `<div style="padding: 20px;">Loading Cash Flow Intelligence...</div>`;
     actions.innerHTML = ``;
@@ -520,6 +523,7 @@ async function renderCashflowPage() {
     setTimeout(() => {
       renderCashflowCharts();
     }, 50);
+    if (typeof scrollToTop === 'function') scrollToTop();
   } catch (renderErr) {
     console.error("Critical error in renderCashflowPage:", renderErr);
     list.innerHTML = `

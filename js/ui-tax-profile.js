@@ -55,6 +55,7 @@ function getSourceBadge(source) {
 }
 
 async function renderTaxProfileTab() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const container = document.getElementById('tax-profile-dashboard');
   if (!container) return;
 
@@ -256,6 +257,7 @@ if (typeof originalRenderTaxDocumentsForProfile === 'function') {
       // Handle tab clicks
       navTabs.addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
+          if (typeof scrollToTop === 'function') scrollToTop();
           const tab = e.target.getAttribute('data-tax-tab');
           if (tab === 'profile') {
             Array.from(listContainer.children).forEach(child => {

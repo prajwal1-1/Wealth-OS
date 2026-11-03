@@ -285,20 +285,102 @@ function storeVaultFile(userId, fileBuffer, originalName = 'document.bin', mimeT
 }
 
 /**
+ * Helper to detect MIME type from buffer magic bytes or file extension
+ */
+function detectMimeType(buffer, filename = '') {
+  if (buffer && buffer.length >= 4) {
+    // PNG: 89 50 4E 47
+    if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
+      return 'image/png';
+    }
+    // JPEG: FF D8 FF
+    if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) {
+      return 'image/jpeg';
+    }
+    // GIF: GIF8
+    if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x38) {
+      return 'image/gif';
+    }
+    // PDF: %PDF-
+    if (buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46) {
+      return 'application/pdf';
+    }
+    // WEBP: RIFF ... WEBP
+    if (buffer.length >= 12 && buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+        buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) {
+      return 'image/webp';
+    }
+  }
+  const ext = path.extname(filename).toLowerCase();
+  if (ext === '.png') return 'image/png';
+  if (ext === '.jpg' || ext === '.jpeg' || ext === '.jfif') return 'image/jpeg';
+  if (ext === '.webp') return 'image/webp';
+  if (ext === '.pdf') return 'application/pdf';
+  if (ext === '.gif') return 'image/gif';
+  return 'application/octet-stream';
+}
+
+/**
  * Retrieve and decrypt a file from persistent vault. Enforces strict user ownership (no IDOR).
  */
 function retrieveVaultFile(userId, fileId, customDb = null) {
   if (!fileId) throw new Error('File ID is required');
 
   const db = customDb || getDb();
-  const vaultFile = db.prepare('SELECT * FROM vault_files WHERE id = ?').get(fileId);
+  let vaultFile = db.prepare('SELECT * FROM vault_files WHERE id = ?').get(fileId);
 
   if (!vaultFile) {
     // Check if file is stored in legacy documents or assets table before returning 404
-    const legacyDoc = db.prepare('SELECT * FROM documents WHERE file_id = ?').get(fileId);
-    if (legacyDoc) {
-      if (userId && legacyDoc.user_id !== userId) {
-        throw new Error('Access denied: You do not own this document');
+    const docMatch = db.prepare('SELECT user_id, file_name FROM documents WHERE file_id = ?').get(fileId);
+    const assetMatch = db.prepare('SELECT user_id, photo_name FROM assets WHERE photo_id = ?').get(fileId);
+    const ownerUserId = docMatch?.user_id || assetMatch?.user_id;
+
+    if (userId && ownerUserId && ownerUserId !== userId) {
+      throw new Error('Access denied: You do not own this document');
+    }
+
+    const effectiveUserId = userId || ownerUserId;
+
+    // Search disk for legacy/unencrypted file in storage/files/<userId>/ or storage/files/
+    const candidateDirs = [
+      effectiveUserId ? path.join(path.resolve(__dirname, '..', '..', 'storage', 'files'), effectiveUserId) : null,
+      path.resolve(__dirname, '..', '..', 'storage', 'files'),
+      effectiveUserId ? path.join(defaultVaultDir, effectiveUserId) : null,
+      defaultVaultDir
+    ].filter(Boolean);
+
+    for (const dir of candidateDirs) {
+      if (!fs.existsSync(dir)) continue;
+      const entries = fs.readdirSync(dir);
+      for (const entry of entries) {
+        if (entry === fileId || entry.startsWith(fileId + '.')) {
+          const candidatePath = path.join(dir, entry);
+          if (fs.statSync(candidatePath).isFile()) {
+            const fileBuf = fs.readFileSync(candidatePath);
+            const origName = docMatch?.file_name || assetMatch?.photo_name || entry;
+            const mime = detectMimeType(fileBuf, origName);
+            const checksum = crypto.createHash('sha256').update(fileBuf).digest('hex');
+
+            if (!entry.endsWith('.enc') && effectiveUserId) {
+              try {
+                // Auto-migrate to encrypted vault for permanence
+                const stored = storeVaultFile(effectiveUserId, fileBuf, origName, mime, db);
+                db.prepare('UPDATE vault_files SET id = ? WHERE id = ?').run(fileId, stored.fileId);
+              } catch (e) {
+                void e;
+              }
+            }
+
+            return {
+              fileBuffer: fileBuf,
+              originalName: origName,
+              mimeType: mime,
+              checksum,
+              size: fileBuf.length,
+              uploadedAt: new Date().toISOString()
+            };
+          }
+        }
       }
     }
     return null;
@@ -315,27 +397,50 @@ function retrieveVaultFile(userId, fileId, customDb = null) {
     // Try standard storage/vault/<userId>/<fileId>.enc location
     fullPath = path.join(defaultVaultDir, vaultFile.user_id, `${fileId}.enc`);
     if (!fs.existsSync(fullPath)) {
+      // Check storage/files/<userId>/<fileId>.*
+      const userFilesDir = path.join(path.resolve(__dirname, '..', '..', 'storage', 'files'), vaultFile.user_id);
+      if (fs.existsSync(userFilesDir)) {
+        const found = fs.readdirSync(userFilesDir).find(f => f === fileId || f.startsWith(fileId + '.'));
+        if (found) fullPath = path.join(userFilesDir, found);
+      }
+    }
+    if (!fs.existsSync(fullPath)) {
       throw new Error(`Vault file data missing from persistent disk: ${vaultFile.stored_path}`);
     }
   }
 
-  const ciphertext = fs.readFileSync(fullPath);
-  const envelope = {
-    ciphertext,
-    fileIv: vaultFile.iv,
-    tag: vaultFile.auth_tag,
-    encrypted_dek: vaultFile.encrypted_dek,
-    checksum: vaultFile.sha256_checksum
-  };
+  const rawDiskBuf = fs.readFileSync(fullPath);
+  let decrypted;
 
-  const decrypted = decryptFile(envelope, getMasterKey());
+  if (fullPath.endsWith('.enc')) {
+    try {
+      const envelope = {
+        ciphertext: rawDiskBuf,
+        fileIv: vaultFile.iv,
+        tag: vaultFile.auth_tag,
+        encrypted_dek: vaultFile.encrypted_dek,
+        checksum: vaultFile.sha256_checksum
+      };
+      decrypted = decryptFile(envelope, getMasterKey());
+    } catch (decryptErr) {
+      // Self-healing fallback: Check if rawDiskBuf is already valid plaintext
+      const detected = detectMimeType(rawDiskBuf, vaultFile.original_name);
+      if (detected !== 'application/octet-stream') {
+        decrypted = rawDiskBuf;
+      } else {
+        throw decryptErr;
+      }
+    }
+  } else {
+    decrypted = rawDiskBuf;
+  }
 
   return {
     fileBuffer: decrypted,
     originalName: vaultFile.original_name,
-    mimeType: vaultFile.mime_type,
-    checksum: vaultFile.sha256_checksum,
-    size: vaultFile.size_bytes,
+    mimeType: vaultFile.mime_type || detectMimeType(decrypted, vaultFile.original_name),
+    checksum: vaultFile.sha256_checksum || crypto.createHash('sha256').update(decrypted).digest('hex'),
+    size: decrypted.length,
     uploadedAt: vaultFile.uploaded_at
   };
 }

@@ -20,3 +20,6 @@ Thumbs.db
 
 # Build artifacts
 *.zip
+
+backend/database.sqlite
+scratch/

@@ -1,5 +1,7 @@
 const tokenKey = "wealth-os-token";
 window.tokenKey = tokenKey;
+const refreshTokenKey = "wealth-os-refresh-token";
+window.refreshTokenKey = refreshTokenKey;
 const localApiBase = "http://localhost:3001";
 
 function apiUrl(path, useFallback = false) {

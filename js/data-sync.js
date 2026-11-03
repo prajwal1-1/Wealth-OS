@@ -213,9 +213,12 @@ function syncInterconnectedData(state) {
   // ═══════════════════════════════════════════════════════════
   // 5. ASSETS & DEBTS ⟷ DIGITAL WILL & ESTATE INTELLIGENCE
   // ═══════════════════════════════════════════════════════════
-  let totalLiabilities = state.liabilities.reduce((s, l) => s + Number(l.value || 0), 0);
+  let totalLiabilities = state.liabilities.reduce((s, l) => s + Number(l.value || l.amount || l.balance || 0), 0);
   state.assets.forEach(a => {
-    totalLiabilities += Number(a.loanAmount || a.loanBalance || a.outstandingLoan || 0);
+    const loanBal = (typeof isAssetFinanced === 'function' && isAssetFinanced(a))
+      ? Number(financedAssetSnapshot(a).outstandingLoan || 0)
+      : Number(a.loanAmount || a.loanBalance || a.outstandingLoan || 0);
+    totalLiabilities += loanBal;
   });
 
   let totalLifeInsuranceCoverage = 0;

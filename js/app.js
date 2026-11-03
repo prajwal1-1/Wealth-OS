@@ -123,7 +123,23 @@ document.addEventListener("change", event => {
   }
 });
 
+// Universal scroll-to-top capture listener: executes in CAPTURE phase before any child listener or inline onclick
+window.addEventListener("click", event => {
+  const isInteractive = event.target.closest(
+    'button, [data-view], [data-tab], [data-tax-tab], [data-asset-category], [data-asset-home], [data-detail], [data-view-shortcut], ' +
+    '.tab, .mobile-tab, .category-card, .vehicle-card, .investment-asset-card, .tax-tab-btn, .vault-role-switcher button, ' +
+    '.vault-nav-btn, .doc-cat-btn, .cashflow-tab-btn, .report-tab-btn, .camera-layout-btn, .advisor-tab-btn, ' +
+    '[onclick*="switch"], [onclick*="render"], [onclick*="select"], [onclick*="filter"], [onclick*="Step"], [onclick*="Tab"], [onclick*="open"], ' +
+    '.asset-card, .holding-card, .report-card, .stream-card, .vault-card, [data-doc-filter], [data-asset-filter], .cockpit-dial, ' +
+    '.stat-card, .metric-module, .quick-action, .advisor-card, .wellness-card, .wellness-mini-card'
+  );
+  if (isInteractive && !['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) {
+    if (typeof scrollToTop === 'function') scrollToTop();
+  }
+}, true);
+
 document.addEventListener("click", event => {
+
   const preview = event.target.closest("[data-preview-file]");
   if (preview) {
     event.preventDefault();
@@ -315,7 +331,10 @@ document.addEventListener("click", event => {
       if (requiredInput) requiredInput.value = add.dataset.prefillRequired || add.dataset.prefillLinked || "";
     }
   }
-  if (detail && detail.dataset.detail === "assets") renderAssetDetail(detail.dataset.id);
+  if (detail && detail.dataset.detail === "assets") {
+    renderAssetDetail(detail.dataset.id);
+    if (typeof scrollToTop === 'function') scrollToTop();
+  }
   if (edit) openModal(edit.dataset.edit, edit.dataset.id);
   if (event.target.closest("#edit-cash")) openCashEditor();
 });
@@ -334,6 +353,7 @@ tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     activeAssetCategory = null;
     renderView(tab.dataset.view);
+    if (typeof scrollToTop === 'function') scrollToTop();
   });
 });
 

@@ -234,6 +234,7 @@ function getSecurityDashboardBanner() {
 // ── Main Render Routine ──────────────────────────────────────
 
 function renderCameras() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   stopAllCanvasLoops();
 
   const locations = getCameraLocations();
@@ -430,6 +431,7 @@ function renderCameras() {
     initSimulatedCctvCanvases();
     attachWebcamStreams();
   }, 50);
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function stopAllCanvasLoops() {
@@ -438,6 +440,7 @@ function stopAllCanvasLoops() {
 }
 
 window.switchCameraLayout = (mode) => {
+  if (typeof scrollToTop === 'function') scrollToTop();
   cameraLayoutMode = mode;
   if (patrolIntervalId) {
     clearInterval(patrolIntervalId);

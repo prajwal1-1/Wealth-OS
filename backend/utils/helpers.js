@@ -56,7 +56,7 @@ const cleanWealthData = data => ({
     serialNumber: shortText(item.serialNumber, 80),
     area: shortText(item.area, 80),
     condition: shortText(item.condition, 40),
-    hasLoan: shortText(item.hasLoan, 20),
+    hasLoan: shortText(item.hasLoan, 60) || (cleanNumber(item.loanAmount) > 0 ? 'Yes (Active Loan)' : ''),
     loanAmount: cleanNumber(item.loanAmount),
     downPayment: cleanNumber(item.downPayment),
     interestRate: cleanNumber(item.interestRate),

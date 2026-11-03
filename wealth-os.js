@@ -1266,20 +1266,21 @@ function valuationSpread(descriptor) {
 }
 
 function financedAssetSnapshot(asset, options = {}) {
+  const safeAsset = asset || {};
   const today = options.today || startOfToday();
-  const purchasePrice = nonNegativeRupees(asset.purchasePrice);
-  const currentValue = nonNegativeRupees(asset.value) || estimateAssetValue(asset)?.value || 0;
-  const purchaseDate = asset.acquisitionDate || "";
+  const purchasePrice = nonNegativeRupees(safeAsset.purchasePrice);
+  const currentValue = nonNegativeRupees(safeAsset.value) || estimateAssetValue(safeAsset)?.value || 0;
+  const purchaseDate = safeAsset.acquisitionDate || "";
   const depreciation = Math.max(0, purchasePrice - currentValue);
   const loan = loanSnapshot({
-    hasLoan: asset.hasLoan,
-    loanAmount: asset.loanAmount,
-    downPayment: asset.downPayment,
-    interestRate: asset.interestRate,
-    loanTenureYears: asset.loanTenureYears,
-    loanStartDate: asset.loanStartDate || purchaseDate,
-    emiAmount: asset.emiAmount,
-    loanType: asset.loanType
+    hasLoan: safeAsset.hasLoan,
+    loanAmount: safeAsset.loanAmount,
+    downPayment: safeAsset.downPayment,
+    interestRate: safeAsset.interestRate,
+    loanTenureYears: safeAsset.loanTenureYears,
+    loanStartDate: safeAsset.loanStartDate || purchaseDate,
+    emiAmount: safeAsset.emiAmount,
+    loanType: safeAsset.loanType
   }, today);
   const outstandingLoan = loan.hasLoan ? loan.remainingBalance : 0;
   const equity = currentValue - outstandingLoan;
@@ -1288,7 +1289,7 @@ function financedAssetSnapshot(asset, options = {}) {
     currentValue,
     purchasePrice,
     purchaseDate,
-    ageYears: assetAgeYears({ acquisitionDate: purchaseDate, year: asset.year }),
+    ageYears: assetAgeYears({ acquisitionDate: purchaseDate, year: safeAsset.year }),
     depreciation,
     depreciationPercent: purchasePrice ? Math.round((depreciation / purchasePrice) * 100) : 0,
     loan,
@@ -1299,23 +1300,40 @@ function financedAssetSnapshot(asset, options = {}) {
   };
 }
 
+function isAssetFinanced(asset) {
+  if (!asset) return false;
+  if (Number(asset.loanAmount || asset.loanBalance || asset.outstandingLoan || 0) > 0) return true;
+  return isTruthy(asset.hasLoan);
+}
+
+function isTruthy(value) {
+  const str = String(value || "").trim().toLowerCase();
+  if (!str || str.startsWith("no") || str === "false" || str === "0") return false;
+  return ["yes", "true", "1", "on", "loan"].includes(str) || /^yes\b|loan\b/i.test(str);
+}
+
 function loanSnapshot(input, today = startOfToday()) {
-  const hasLoan = isTruthy(input.hasLoan);
   const loanAmount = Number(input.loanAmount || 0);
+  const isExplicitlyNo = String(input.hasLoan || "").trim().toLowerCase().startsWith("no");
+  const hasLoan = (isTruthy(input.hasLoan) || loanAmount > 0) && (!isExplicitlyNo || loanAmount > 0);
   const downPayment = Number(input.downPayment || 0);
   const loanType = /flat/i.test(input.loanType || "") ? "Flat Interest" : "Reducing Balance";
   if (!hasLoan || loanAmount <= 0) {
     return emptyLoanSnapshot({ downPayment, loanType });
   }
+
   const annualRate = Number(input.interestRate || 0);
-  const tenureMonths = Math.max(1, Math.round(Number(input.loanTenureYears || 0) * 12));
+  const rawTenureYears = Number(input.loanTenureYears || 0);
+  const isRealEstate = /flat|house|property|land|commercial|apartment|building/i.test(input.type || input.name || "");
+  const defaultTenureYears = isRealEstate ? 20 : 5;
+  const tenureMonths = rawTenureYears > 0 ? Math.max(1, Math.round(rawTenureYears * 12)) : (defaultTenureYears * 12);
   const startDate = input.loanStartDate || new Date().toISOString().slice(0, 10);
   const completedEmis = Math.min(tenureMonths, Math.max(0, monthsBetween(startDate, today)));
-  const monthlyRate = annualRate / 12 / 100;
+  const monthlyRate = annualRate > 0 ? (annualRate / 12 / 100) : 0;
   const flatInterest = loanAmount * (annualRate / 100) * (tenureMonths / 12);
   const calculatedEmi = loanType === "Flat Interest"
     ? (loanAmount + flatInterest) / tenureMonths
-    : monthlyRate
+    : monthlyRate > 0
       ? loanAmount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths) / (Math.pow(1 + monthlyRate, tenureMonths) - 1)
       : loanAmount / tenureMonths;
   const enteredEmi = Number(input.emiAmount || 0);
@@ -1323,20 +1341,25 @@ function loanSnapshot(input, today = startOfToday()) {
   let principalPaidToDate = 0;
   let interestPaidToDate = 0;
   let remainingBalance = loanAmount;
-  if (loanType === "Flat Interest") {
-    const principalPerMonth = loanAmount / tenureMonths;
-    const interestPerMonth = flatInterest / tenureMonths;
-    principalPaidToDate = Math.min(loanAmount, principalPerMonth * completedEmis);
-    interestPaidToDate = Math.max(0, interestPerMonth * completedEmis);
-    remainingBalance = Math.max(0, loanAmount - principalPaidToDate);
-  } else {
-    remainingBalance = monthlyRate
-      ? loanAmount * Math.pow(1 + monthlyRate, completedEmis) - emi * ((Math.pow(1 + monthlyRate, completedEmis) - 1) / monthlyRate)
-      : loanAmount - emi * completedEmis;
-    remainingBalance = Math.min(loanAmount, Math.max(0, remainingBalance));
-    principalPaidToDate = Math.min(loanAmount, Math.max(0, loanAmount - remainingBalance));
-    interestPaidToDate = Math.max(0, emi * completedEmis - principalPaidToDate);
+
+  if (completedEmis > 0) {
+    if (loanType === "Flat Interest") {
+      const principalPerMonth = loanAmount / tenureMonths;
+      const interestPerMonth = flatInterest / tenureMonths;
+      principalPaidToDate = Math.min(loanAmount, principalPerMonth * completedEmis);
+      interestPaidToDate = Math.max(0, interestPerMonth * completedEmis);
+      remainingBalance = Math.max(0, loanAmount - principalPaidToDate);
+    } else if (monthlyRate > 0) {
+      remainingBalance = loanAmount * Math.pow(1 + monthlyRate, completedEmis) - emi * ((Math.pow(1 + monthlyRate, completedEmis) - 1) / monthlyRate);
+      remainingBalance = Math.min(loanAmount, Math.max(0, remainingBalance));
+      principalPaidToDate = Math.min(loanAmount, Math.max(0, loanAmount - remainingBalance));
+      interestPaidToDate = Math.max(0, emi * completedEmis - principalPaidToDate);
+    } else {
+      principalPaidToDate = Math.min(loanAmount, emi * completedEmis);
+      remainingBalance = Math.max(0, loanAmount - principalPaidToDate);
+    }
   }
+
   const totalRepayment = emi * tenureMonths;
   const totalInterestPayable = Math.max(0, totalRepayment - loanAmount);
   const roundedRemaining = roundRupees(remainingBalance);
@@ -1390,10 +1413,6 @@ function monthsBetween(startDateValue, endDate) {
   let months = (endDate.getFullYear() - start.getFullYear()) * 12 + (endDate.getMonth() - start.getMonth());
   if (endDate.getDate() < start.getDate()) months -= 1;
   return Math.max(0, months);
-}
-
-function isTruthy(value) {
-  return ["yes", "true", "1", "on", "loan"].includes(String(value || "").trim().toLowerCase());
 }
 
 function conditionMultiplier(value) {
@@ -1925,13 +1944,15 @@ function totals() {
   const cash = cashBalance();
   const marketAssets = assetItems.reduce((sum, item) => sum + nonNegativeRupees(item.value), 0);
   const assetEquity = assetItems.reduce((sum, item) => sum + assetNetWorthContribution(item), 0);
-  const vehicleLoanBalance = assetItems.reduce((sum, item) => sum + vehicleOutstandingLoan(item), 0);
-  const liabilities = state.liabilities.reduce((sum, item) => sum + nonNegativeRupees(item.value), 0);
+  const assetLoanBalance = assetItems.reduce((sum, item) => sum + assetOutstandingLoan(item), 0);
+  const liabilities = state.liabilities.reduce((sum, item) => sum + nonNegativeRupees(item.value || item.amount || item.balance), 0);
   const emi = state.liabilities.reduce((sum, item) => sum + nonNegativeRupees(item.emi), 0) +
-    assetItems.reduce((sum, item) => sum + vehicleEmi(item), 0);
+    assetItems.reduce((sum, item) => sum + assetEmi(item), 0);
   const cashFlow = Number(state.cash.income || 0) - Number(state.cash.expenses || 0) - emi;
   const renewalCount = upcoming().length;
-  const debtRatio = marketAssets ? Math.round(((liabilities + vehicleLoanBalance) / marketAssets) * 100) : 0;
+  const totalAssets = marketAssets + cash;
+  const totalLiabilities = liabilities + assetLoanBalance;
+  const debtRatio = totalAssets ? Math.round((totalLiabilities / totalAssets) * 100) : 0;
   const savingsRate = state.cash.income ? Math.max(0, Math.round((cashFlow / state.cash.income) * 100)) : 0;
   const insuranceDocs = state.documents.filter(item => /insurance/i.test(`${item.type} ${item.name}`)).length;
   const health = Math.max(0, Math.min(100, 60 + savingsRate - Math.round(debtRatio / 2) + insuranceDocs * 4));
@@ -1940,9 +1961,9 @@ function totals() {
     marketAssets,
     assetEquity,
     cash,
-    liabilities: liabilities + vehicleLoanBalance,
+    liabilities: totalLiabilities,
     explicitLiabilities: liabilities,
-    vehicleLoanBalance,
+    assetLoanBalance,
     netWorth: assetEquity + cash - liabilities,
     emi,
     cashFlow,
@@ -1954,17 +1975,17 @@ function totals() {
 }
 
 function assetNetWorthContribution(asset) {
-  if (isVehicleAsset(asset) && isTruthy(asset.hasLoan)) return financedAssetSnapshot(asset).netWorthContribution;
+  if (isAssetFinanced(asset)) return financedAssetSnapshot(asset).netWorthContribution;
   return nonNegativeRupees(asset.value);
 }
 
-function vehicleOutstandingLoan(asset) {
-  if (!isVehicleAsset(asset) || !isTruthy(asset.hasLoan)) return 0;
+function assetOutstandingLoan(asset) {
+  if (!isAssetFinanced(asset)) return 0;
   return financedAssetSnapshot(asset).outstandingLoan;
 }
 
-function vehicleEmi(asset) {
-  if (!isVehicleAsset(asset) || !isTruthy(asset.hasLoan)) return 0;
+function assetEmi(asset) {
+  if (!isAssetFinanced(asset)) return 0;
   return financedAssetSnapshot(asset).loan.emi;
 }
 
@@ -2104,7 +2125,55 @@ function renderTimeline() {
     : "<li><b>Clear</b> No renewals due</li>";
 }
 
+function scrollToTop(behavior = 'instant') {
+  try {
+    if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+  } catch (_) {}
+
+  const doScroll = () => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: behavior });
+    } catch (_) {
+      try { window.scrollTo(0, 0); } catch (_) {}
+    }
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+    
+    // Explicit known containers
+    const scrollContainers = document.querySelectorAll(
+      '.workspace, .main-panel, .app-shell, #app-shell, .content-grid, .app-list, #app-list, .asset-category-view, .wellness-dashboard, .doc-vault-container, .reports-hub-container, .ai-advisor-container, .income-streams-container'
+    );
+    scrollContainers.forEach(el => {
+      if (el) el.scrollTop = 0;
+    });
+
+    // Universal fallback: scan any element that has scroll offset
+    try {
+      const allScrolled = document.querySelectorAll('*');
+      for (let i = 0; i < allScrolled.length; i++) {
+        const node = allScrolled[i];
+        if (node.scrollTop > 0 && !node.classList.contains('chat-thread') && node.id !== 'ai-chat-thread') {
+          node.scrollTop = 0;
+        }
+      }
+    } catch (_) {}
+  };
+
+  doScroll();
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(doScroll);
+  }
+  setTimeout(doScroll, 10);
+  setTimeout(doScroll, 50);
+  setTimeout(doScroll, 150);
+  setTimeout(doScroll, 300);
+}
+if (typeof window !== 'undefined') window.scrollToTop = scrollToTop;
+
 function renderView(viewName = activeView) {
+  scrollToTop();
   activeView = viewName;
   document.body.classList.toggle("map-dashboard", viewName === "home");
   if (searchInput.value.trim()) {
@@ -2115,6 +2184,7 @@ function renderView(viewName = activeView) {
     list.innerHTML = searchRecords(searchInput.value);
     refreshMetrics();
     syncTabs(viewName);
+    scrollToTop();
     return;
   }
   const view = config[viewName];
@@ -2133,6 +2203,7 @@ function renderView(viewName = activeView) {
 
   refreshMetrics();
   syncTabs(viewName);
+  scrollToTop();
 }
 
 function setActions(collection, extra = "") {
@@ -2351,8 +2422,10 @@ function dashboardActivityCard() {
 }
 
 function renderAssets() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   if (activeAssetCategory && assetCategoryViews[activeAssetCategory]) {
     renderAssetCategory(activeAssetCategory);
+    if (typeof scrollToTop === 'function') scrollToTop();
     return;
   }
   const data = totals();
@@ -2377,6 +2450,7 @@ function renderAssets() {
     ${sectionHeader("Saved Assets", `${filteredAssets.length} shown`)}
     ${assetPortfolioCards(filteredAssets)}
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function assetPortfolioSummary() {
@@ -2951,6 +3025,7 @@ function assetSmartSignal(asset) {
 }
 
 function renderAssetCategory(categoryKey) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const category = assetCategoryViews[categoryKey];
   const items = state.assets.filter(asset => assetCategoryForAsset(asset) === categoryKey);
   if (categoryKey === "investments") {
@@ -2975,9 +3050,11 @@ function renderAssetCategory(categoryKey) {
     ${sectionHeader(`Your ${category.title.toLowerCase()}`, items.length ? "Click to see specifications" : category.emptyText)}
     ${items.length ? categoryCards(items, category) : categoryEmptyState(category)}
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function renderInvestmentCategory(category, items) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const filteredItems = filterInvestmentHoldings(items, investmentFilters);
   const sortedItems = sortedInvestmentHoldings(filteredItems, investmentSort);
   const summary = investmentPortfolioSummary(items);
@@ -3014,6 +3091,7 @@ function renderInvestmentCategory(category, items) {
     ${sortedItems.length ? `${sectionHeader("Holdings Table", "Sortable spreadsheet-style view")}${investmentHoldingsTable(sortedItems, summary.currentValue)}` : ""}
     ${items.length ? `${sectionHeader("P/L Statement", "Realized, unrealized and dividend return")}${investmentPlStatement(items, summary)}` : ""}
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function investmentSignalDeck(items, summary) {
@@ -3895,6 +3973,7 @@ function categoryCard(item, category) {
 }
 
 function renderAssetDetail(assetId) {
+  if (typeof scrollToTop === 'function') scrollToTop();
   const asset = state.assets.find(item => item.id === assetId);
   if (!asset) {
     renderView("assets");
@@ -3960,6 +4039,7 @@ function renderAssetDetail(assetId) {
   `;
   syncTabs("assets");
   refreshMetrics();
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function vehicleAppraisalWorkflow(asset) {
@@ -4647,6 +4727,7 @@ function assetChecklistSummary(asset) {
 }
 
 function renderTaxDocuments() {
+  if (typeof scrollToTop === 'function') scrollToTop();
   actions.innerHTML = `
     <button class="primary-action" type="button" data-add="documents" data-prefill-linked="Tax Filing" data-prefill-required="Tax Documents">Upload Tax Document</button>
   `;
@@ -4680,6 +4761,7 @@ function renderTaxDocuments() {
     </div>
     ${activeTaxTab === "checklist" ? renderTaxChecklistPage(uploaded, required.length) : activeTaxTab === "income" ? renderIncomeDetailsPage() : activeTaxTab === "deductions" ? renderTaxDeductionsPage() : activeTaxTab === "calculator" ? renderTaxCalculatorPage() : activeTaxTab === "ai-suggestions" ? renderAiTaxSuggestionsPage() : renderShareWithCaPage()}
   `;
+  if (typeof scrollToTop === 'function') scrollToTop();
 }
 
 function renderIncomeDetailsPage() {
@@ -6512,7 +6594,23 @@ document.addEventListener("change", event => {
   }
 });
 
+// Universal scroll-to-top capture listener: executes in CAPTURE phase before any child listener or inline onclick
+window.addEventListener("click", event => {
+  const isInteractive = event.target.closest(
+    'button, [data-view], [data-tab], [data-tax-tab], [data-asset-category], [data-asset-home], [data-detail], [data-view-shortcut], ' +
+    '.tab, .mobile-tab, .category-card, .vehicle-card, .investment-asset-card, .tax-tab-btn, .vault-role-switcher button, ' +
+    '.vault-nav-btn, .doc-cat-btn, .cashflow-tab-btn, .report-tab-btn, .camera-layout-btn, .advisor-tab-btn, ' +
+    '[onclick*="switch"], [onclick*="render"], [onclick*="select"], [onclick*="filter"], [onclick*="Step"], [onclick*="Tab"], [onclick*="open"], ' +
+    '.asset-card, .holding-card, .report-card, .stream-card, .vault-card, [data-doc-filter], [data-asset-filter], .cockpit-dial, ' +
+    '.stat-card, .metric-module, .quick-action, .advisor-card, .wellness-card, .wellness-mini-card'
+  );
+  if (isInteractive && !['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)) {
+    if (typeof scrollToTop === 'function') scrollToTop();
+  }
+}, true);
+
 document.addEventListener("click", event => {
+
   const preview = event.target.closest("[data-preview-file]");
   if (preview) {
     event.preventDefault();
@@ -6695,7 +6793,10 @@ document.addEventListener("click", event => {
       if (requiredInput) requiredInput.value = add.dataset.prefillRequired || add.dataset.prefillLinked || "";
     }
   }
-  if (detail && detail.dataset.detail === "assets") renderAssetDetail(detail.dataset.id);
+  if (detail && detail.dataset.detail === "assets") {
+    renderAssetDetail(detail.dataset.id);
+    if (typeof scrollToTop === 'function') scrollToTop();
+  }
   if (edit) openModal(edit.dataset.edit, edit.dataset.id);
   if (event.target.closest("#edit-cash")) openCashEditor();
 });
@@ -6714,6 +6815,7 @@ tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     activeAssetCategory = null;
     renderView(tab.dataset.view);
+    if (typeof scrollToTop === 'function') scrollToTop();
   });
 });
 
